@@ -20,7 +20,7 @@ uartCMD = {
 EepromDataDict = {
     "safetyB1"      : 0x93,
     "safetyB2"      : 0xDA,
-    "cellsInSer"    : 0x20,
+    "cellsInSer"    : 5,
     "capBat"        : 0x0F,
     "numCCstart1"   : 0,
     "numCCstart2"   : 0,

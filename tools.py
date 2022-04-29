@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 import time
 from time import sleep
-from anyio import start_blocking_portal
+#from anyio import start_blocking_portal
 import serial
 from gpiozero import *
 
@@ -45,6 +45,7 @@ class SensorRead(ttk.Frame):
         voltageBatl = ttk.Label(sensFrame, textvariable=self.voltBat)
         voltageBatl.grid(column=3, row=1)
 
+        self.checkCellVoltage()
         vcl = ttk.Label(sensFrame,text="Spannung Zelle")
         vcl.grid(column=2,row=2)
 
@@ -72,7 +73,8 @@ class SensorRead(ttk.Frame):
         #self.voltBat.set(self.voltage_meas.value)
         self.voltBat.set(self.voltage_meas)
 
-
+    def checkCellVoltage(self):
+        self.voltCell.set(self.voltage_meas / EepromDataDict["cellsInSer"])
         #after Befehl fehlt hier noch
         
     def checkCurrent(self):

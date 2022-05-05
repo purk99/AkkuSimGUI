@@ -118,7 +118,20 @@ class EepromChargeParam(ttk.Frame):
             #p[i].configure(text=EepromDataCharge[i])
             self.tchargeLabels[i].configure(text=EepromDataCharge[i])
             i += 1
+    
+    def changeChargeLabels(self):
+        pass
+
+class EepromParamChange(ttk.Frame):
+    def __init__(self,parent):
+        ttk.Frame.__init__(self,parent)
+
+        self.grid()
+        self.config(relief="ridge", padding=10)
         
+        ttk.Label(self,text="Parameter ändern").grid(column=1,row=0)
+        
+
 class EepromCycleParam(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)

@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 import time
 from time import sleep
-from anyio import start_blocking_portal
+#from anyio import start_blocking_portal
 import serial
 from gpiozero import *
 
@@ -135,7 +135,7 @@ class EepromControl():
         #super().__init__()
         self.sendBuffer = bytearray(5)
         self.receiveBuffer = bytearray(3)
-        #self.ser = serial.Serial("/dev/ttyS0", 9600)
+        self.ser = serial.Serial("/dev/ttyS0", 9600)
 
     def sendPackage(self,id,adress,content):
         self.sendBuffer[0] = START_BIT

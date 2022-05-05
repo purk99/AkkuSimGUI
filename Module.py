@@ -69,7 +69,7 @@ class ModulEeprom(Toplevel):
 
     def showModulEepromCycleParam(self):
         cF = EepromCycleParam(self)
-        cF.grid(column=3,row=0)
+        cF.grid(column=0,row=3)
 
 class ModulTemperatur(Toplevel):
     def __init__(self,master=None):

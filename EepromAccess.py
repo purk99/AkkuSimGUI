@@ -94,7 +94,33 @@ class EepromChargeParam(ttk.Frame):
         #self.updateChargeLabels()
 
         uB = ttk.Button(self,text="Daten aktualisieren", command=self.updateChargeLabels)
-        uB.grid(column=1,row=10)
+        uB.grid(column=0,row=10)
+
+        ###Änderungen an Charge-Parametern###
+        paramChangeL = ttk.Label(self,text="Parameter: ")
+        paramChangeL.grid(column=1,row=10)
+
+        paramChangeB = ttk.Button(self,text="Parameter ändern")
+
+        #Combobox
+        combo = ttk.Combobox(self,values=[  "T_min",
+                                            "T_cold",
+                                            "T_max",
+                                            "U_cold",
+                                            "U_warm",
+                                            "U_max",
+                                            "I_cold",
+                                            "I_warm",
+                                            "I_max"
+                                        ])
+        combo.grid(column=2,row=10)
+
+        valL = ttk.Label(self,text="Wert: ")
+        valL.grid(column=1,row=11)
+
+        valCombo = ttk.Combobox(self,values=EepromDataValues)
+        valCombo.grid(column=2,row=11)
+        
         
         self.tchargeLabels = [  tminLabel,
                                 tcoldLabel,

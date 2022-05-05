@@ -98,3 +98,5 @@ EepromDataCycle = [ EepromDataDict["numCCstart1"],
                     EepromDataDict["numCVstop1"],
                     EepromDataDict["numCVstop2"]
                 ]
+
+EepromDataValues = list(range(255))

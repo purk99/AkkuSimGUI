@@ -137,7 +137,7 @@ class EepromControl():
         #super().__init__()
         self.sendBuffer = bytearray(5)
         self.receiveBuffer = bytearray(3)
-        #self.ser = serial.Serial("/dev/ttyS0", 9600)
+        self.ser = serial.Serial("/dev/ttyS0", 9600)
 
     def sendPackage(self,id,adress,content):
         self.sendBuffer[0] = START_BIT
@@ -145,7 +145,7 @@ class EepromControl():
         self.sendBuffer[2] = adress
         self.sendBuffer[3] = content
         self.sendBuffer[4] = STOP_BIT
-        #self.ser.write(self.sendBuffer)
+        self.ser.write(self.sendBuffer)
         #print(self.sendBuffer)
 
     def receivePackage(self):

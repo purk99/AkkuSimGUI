@@ -45,6 +45,7 @@ class SensorRead(ttk.Frame):
         voltageBatl = ttk.Label(sensFrame, textvariable=self.voltBat)
         voltageBatl.grid(column=3, row=1)
 
+        self.checkCellVoltage()
         vcl = ttk.Label(sensFrame,text="Spannung Zelle")
         vcl.grid(column=2,row=2)
 
@@ -72,7 +73,8 @@ class SensorRead(ttk.Frame):
         #self.voltBat.set(self.voltage_meas.value)
         self.voltBat.set(self.voltage_meas)
 
-
+    def checkCellVoltage(self):
+        self.voltCell.set(self.voltage_meas / EepromDataDict["cellsInSer"])
         #after Befehl fehlt hier noch
         
     def checkCurrent(self):
@@ -143,7 +145,7 @@ class EepromControl():
         self.sendBuffer[2] = adress
         self.sendBuffer[3] = content
         self.sendBuffer[4] = STOP_BIT
-        #self.ser.write(self.sendBuffer)
+        self.ser.write(self.sendBuffer)
         #print(self.sendBuffer)
 
     def receivePackage(self):

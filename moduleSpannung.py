@@ -31,7 +31,7 @@ class ModulSpannungTEntladung(ttk.Frame):
 
     def deepDischarge(self):
         #auf Teststart warten
-        self.cd = Countdown(self.modulFrame,10)
+        self.cd = Countdown(self.modulFrame,30)
         self.cd.grid(column=1,row=2)
             #zeit starten, bis t=30s muss spannung gestiegen sein
         self.indLabel.after(1000,self.checkCountStatus)

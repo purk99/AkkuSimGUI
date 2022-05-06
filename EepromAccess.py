@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 from EepromData import *
+from tools import EepromControl
 
 
 class EepromInfo(Toplevel):
@@ -100,10 +101,8 @@ class EepromChargeParam(ttk.Frame):
         paramChangeL = ttk.Label(self,text="Parameter: ")
         paramChangeL.grid(column=1,row=10)
 
-        paramChangeB = ttk.Button(self,text="Parameter ändern")
-
         #Combobox
-        combo = ttk.Combobox(self,values=[  "T_min",
+        self.combo = ttk.Combobox(self,values=[  "T_min",
                                             "T_cold",
                                             "T_max",
                                             "U_cold",
@@ -113,13 +112,16 @@ class EepromChargeParam(ttk.Frame):
                                             "I_warm",
                                             "I_max"
                                         ])
-        combo.grid(column=2,row=10)
+        self.combo.grid(column=2,row=10)
+
+        updateB = ttk.Button(self,text="Parameter ändern",command=self.changeChargeLabels)
+        updateB.grid(column=3,row=10)
 
         valL = ttk.Label(self,text="Wert: ")
         valL.grid(column=1,row=11)
 
-        valCombo = ttk.Combobox(self,values=EepromDataValues)
-        valCombo.grid(column=2,row=11)
+        self.valCombo = ttk.Combobox(self,values=EepromDataValues)
+        self.valCombo.grid(column=2,row=11)
         
         
         self.tchargeLabels = [  tminLabel,
@@ -139,14 +141,32 @@ class EepromChargeParam(ttk.Frame):
 
     def updateChargeLabels(self):
         i = 0
-
         for p in self.tchargeLabels:                	
             #p[i].configure(text=EepromDataCharge[i])
             self.tchargeLabels[i].configure(text=EepromDataCharge[i])
             i += 1
     
+    #unbedingt auf Reihenfolge und Position in EepromData.py achten!
+    #bei Veränderung der Listen müssen die Indizes überprüft werden
     def changeChargeLabels(self):
-        pass
+
+        self.chargeParamSelect =  self.combo.current()
+        EepromDataCharge[self.chargeParamSelect] = self.valCombo.get()
+        
+        #self.chargeParamselect + 10 -> ab Pos 10 fängt EepromDataCharge an
+        EepromDataComplete[self.chargeParamSelect+10] = EepromDataCharge[self.chargeParamSelect]
+        #aktualisierung Aller Parameter in GUI
+        print(EepromDataCharge[self.chargeParamSelect],end="\n")
+        print(EepromDataComplete[self.chargeParamSelect+10])
+        self.updateChargeLabels()
+        #Eeprom-Daten auf Arduino überschreiben
+        #auskommentiert da
+        #self.changeEepromData(self.chargeParamSelect+10,EepromDataCharge[self.chargeParamSelect])
+
+    #Änderung von Parametern auf Arduino
+    def changeEepromData(self,adress,content):
+        arduninoEeprom = EepromControl()
+        arduninoEeprom.sendPackage(uartCMD["WriteSingleReg"],adress,content)
 
 class EepromParamChange(ttk.Frame):
     def __init__(self,parent):

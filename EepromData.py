@@ -5,6 +5,14 @@
 #       (sowohl EEPROM als auch NTC und Overvoltage)
 ########################################################
 
+###                         !!ACHTUNG!!
+#bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
+#in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
+#Indizierung prüfen
+###                         !!ACHTUNG!!
+
+
+
 ###Commands für Arduino
 uartCMD = {
     "eepromReadSingleReg"   :   0x01,
@@ -16,7 +24,7 @@ uartCMD = {
     "voltageProtectWrite"   :   0x07
 }
 
-
+###Startwerte für alle Listen###
 EepromDataDict = {
     "safetyB1"      : 0x93,
     "safetyB2"      : 0xDA,
@@ -45,7 +53,9 @@ InfoDataDict = {
     "NTCvalue"      : 0xf0,
     "Overvoltage"   : 0xf0
                 }
-
+#bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
+#in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
+#Indizierung prüfen
 EepromDataComplete = [  EepromDataDict["safetyB1"],
                         EepromDataDict["safetyB2"],
                         EepromDataDict["cellsInSer"],
@@ -78,6 +88,9 @@ EepromDataSafety = [EepromDataDict["safetyB1"],
                     EepromDataDict["cellsInSer"]
                 ]
 
+#bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
+#in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
+#Indizierung prüfen
 EepromDataCharge = [EepromDataDict["T_min"],
                     EepromDataDict["T_cold"],
                     EepromDataDict["T_warm"],

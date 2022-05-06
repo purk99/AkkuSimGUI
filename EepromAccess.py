@@ -92,6 +92,11 @@ class EepromChargeParam(ttk.Frame):
         parActLabel = ttk.Label(self,text=EepromDataCharge[10])
         parActLabel.grid(column=4,row=5)
 
+        self.varChargeActText = StringVar()
+        self.varChargeActText.set("Variable Parameter: ein")
+        self.changeParActB = ttk.Button(self,textvariable=self.varChargeActText,command=self.changeVarCharge)
+        self.changeParActB.grid(column=3,row=6)
+
         #self.updateChargeLabels()
 
         uB = ttk.Button(self,text="Daten aktualisieren", command=self.updateChargeLabels)
@@ -132,17 +137,13 @@ class EepromChargeParam(ttk.Frame):
                                 umaxLabel,
                                 icoldLabel,
                                 iwarmLabel,
-                                imaxLabel
+                                imaxLabel,
+                                parActLabel
                              ]
-        
-
-        # for i in self.tchargeLabels:
-        #    i = ttk.Frame(self,text=self.tchargeLabels[i])
 
     def updateChargeLabels(self):
         i = 0
         for p in self.tchargeLabels:                	
-            #p[i].configure(text=EepromDataCharge[i])
             self.tchargeLabels[i].configure(text=EepromDataCharge[i])
             i += 1
     
@@ -160,14 +161,29 @@ class EepromChargeParam(ttk.Frame):
         print(EepromDataComplete[self.chargeParamSelect+10])
         self.updateChargeLabels()
         #Eeprom-Daten auf Arduino überschreiben
-        #auskommentiert da
-        #self.changeEepromData(self.chargeParamSelect+10,EepromDataCharge[self.chargeParamSelect])
+        self.changeEepromData(self.chargeParamSelect+10,EepromDataCharge[self.chargeParamSelect])
 
     #Änderung von Parametern auf Arduino
     def changeEepromData(self,adress,content):
         arduninoEeprom = EepromControl()
         arduninoEeprom.sendPackage(uartCMD["WriteSingleReg"],adress,content)
 
+    def changeVarCharge(self):
+        
+        if EepromDataCharge[10] == 0xF0:
+            self.varChargeActText.set("Variable Parameter: ein")
+            EepromDataCharge[10] = 0x0F
+            #EepromDataComplete[20] = EepromDataCharge[10]
+            self.changeEepromData(20,EepromDataCharge[10])
+            self.updateChargeLabels()
+        else:
+            self.varChargeActText.set("Variable Parameter: aus")
+            EepromDataCharge[10] = 0xF0
+            #EepromDataComplete[20] = EepromDataCharge[10]
+            self.changeEepromData(20,EepromDataCharge[10])
+            self.updateChargeLabels()
+
+#kann weg
 class EepromParamChange(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)

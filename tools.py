@@ -6,6 +6,7 @@ from time import sleep
 #from anyio import start_blocking_portal
 import serial
 from gpiozero import *
+from smbus2 import SMBus
 
 from EepromData import *
 
@@ -19,6 +20,9 @@ testList = [0x55, 0x30,0x28,1]
 
 class SensorRead(ttk.Frame):
     def __init__(self,parent):
+        i2c_sense = SMBus(1)
+        i2cadressb = 0x30
+        #i2c_sense.write_byte_data(i2cadressb,IOCON,0x02) 
 
         self.voltBat = StringVar()
         self.voltCell = StringVar()
@@ -132,6 +136,7 @@ class Countdown(ttk.Frame):
     def getStartDur(self):
         return self.durStart
 
+#für UART-Kommunikation
 class EepromControl():
     def __init__(self):
         #super().__init__()

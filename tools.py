@@ -5,7 +5,6 @@ import time
 from time import sleep
 #from anyio import start_blocking_portal
 import serial
-from gpiozero import *
 from smbus2 import SMBus
 
 from EepromData import *
@@ -20,17 +19,13 @@ testList = [0x55, 0x30,0x28,1]
 
 class SensorRead(ttk.Frame):
     def __init__(self,parent):
-        i2c_sense = SMBus(1)
-        i2cadressb = 0x30
+        self.i2c_bus = SMBus(1)
+        self.i2cadress = 0x30
         #i2c_sense.write_byte_data(i2cadressb,IOCON,0x02) 
 
         self.voltBat = StringVar()
         self.voltCell = StringVar()
         self.currBat = StringVar()
-
-        #Messung von Spannung und Strom 
-        #self.voltage_meas = InputDevice(19)
-        #self.current_meas = InputDevice(20)
         
         #dummywerte
         self.voltage_meas = 18
@@ -41,27 +36,57 @@ class SensorRead(ttk.Frame):
         sensFrame = self
         sensFrame.grid()
 
-    
-        self.checkVoltage()
+        #self.checkVoltage()
         vbl = ttk.Label(sensFrame, text="Spannung Batterie")
         vbl.grid(column=2,row=1)
 
         voltageBatl = ttk.Label(sensFrame, textvariable=self.voltBat)
         voltageBatl.grid(column=3, row=1)
 
-        self.checkCellVoltage()
+        #self.checkCellVoltage()
         vcl = ttk.Label(sensFrame,text="Spannung Zelle")
         vcl.grid(column=2,row=2)
 
         voltageCelll = ttk.Label(sensFrame, textvariable=self.voltCell)
         voltageCelll.grid(column=3,row=2)
 
-        self.checkCurrent()
+        #self.checkCurrent()
         ibl = ttk.Label(sensFrame,text="Batterie Gesamtstrom")
         ibl.grid(column=2,row=3)
 
         currentBatl = ttk.Label(sensFrame, textvariable=self.currBat)
         currentBatl.grid(column=3,row=3)
+
+        startMeasB = ttk.Button(self,text="Starte Messung",command=self.startMeas)
+
+    def startMeas(self):
+        self.checkVoltage()
+        self.checkCellVoltage()
+        self.checkCurrent()
+
+    def checkVoltage(self):
+        #Befehl in Verbindung mit I2C-Bus
+        self.voltBat.set(self.i2c_getvoltageData())
+        self.after(100,self.checkVoltage)
+
+    def checkCellVoltage(self):
+        self.voltCell.set(self.voltage_meas / EepromDataDict["cellsInSer"])
+        self.after(100,self.checkCellVoltage)
+
+    def checkCurrent(self):
+        #Befehl in Verbindung mit I2C-Bus
+        self.currBat.set(self.i2c_getCurrentData())
+        self.after(100,self.checkCurrent)
+
+    def i2c_getvoltageData(self):
+        self.i2c_bus.write_byte(self.i2cadress,0x01)
+        val = self.i2c_bus.read_byte(self.i2cadress)
+        return val
+    
+    def i2c_getCurrentData(self):
+        self.i2c_bus.write_byte(self.i2cadress,0x02)
+        val = self.i2c_bus.read_byte(self.i2cadress)
+        return val
 
     def getVoltageBat(self):
         return self.voltBat
@@ -72,22 +97,6 @@ class SensorRead(ttk.Frame):
     def getCurrBat(self):
         return self.currBat
 
-    def checkVoltage(self):
-        #Befehl in Verbindung mit InputDevice
-        #self.voltBat.set(self.voltage_meas.value)
-        self.voltBat.set(self.voltage_meas)
-
-    def checkCellVoltage(self):
-        self.voltCell.set(self.voltage_meas / EepromDataDict["cellsInSer"])
-        #after Befehl fehlt hier noch
-        
-    def checkCurrent(self):
-        #Befehl in Verbindung mit InputDevice
-        #self.currBat.set(self.current_meas.value)
-        self.currBat.set(self.current_meas)
-
-
-        #after Befehl fehlt
 
 class Countdown(ttk.Frame):
     def __init__(self,parent,duration):

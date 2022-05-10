@@ -20,7 +20,7 @@ testList = [0x55, 0x30,0x28,1]
 class SensorRead(ttk.Frame):
     def __init__(self,parent):
         self.i2c_bus = SMBus(1)
-        self.i2cadress = 0x30
+        self.i2cadress = 0x31
         #i2c_sense.write_byte_data(i2cadressb,IOCON,0x02) 
 
         self.voltBat = StringVar()
@@ -28,59 +28,60 @@ class SensorRead(ttk.Frame):
         self.currBat = StringVar()
         
         #dummywerte
-        self.voltage_meas = 18
-        self.current_meas = 5
+        #self.voltage_meas = 18
+        #self.current_meas = 5
 
         ttk.Frame.__init__(self, parent)
 
         sensFrame = self
         sensFrame.grid()
 
-        #self.checkVoltage()
         vbl = ttk.Label(sensFrame, text="Spannung Batterie")
         vbl.grid(column=2,row=1)
 
-        voltageBatl = ttk.Label(sensFrame, textvariable=self.voltBat)
-        voltageBatl.grid(column=3, row=1)
+        self.voltageBatl = ttk.Label(sensFrame, textvariable=self.voltBat)
+        self.voltageBatl.grid(column=3, row=1)
 
-        #self.checkCellVoltage()
-        vcl = ttk.Label(sensFrame,text="Spannung Zelle")
-        vcl.grid(column=2,row=2)
+        self.vcl = ttk.Label(sensFrame,text="Spannung Zelle")
+        self.vcl.grid(column=2,row=2)
 
         voltageCelll = ttk.Label(sensFrame, textvariable=self.voltCell)
         voltageCelll.grid(column=3,row=2)
 
-        #self.checkCurrent()
         ibl = ttk.Label(sensFrame,text="Batterie Gesamtstrom")
         ibl.grid(column=2,row=3)
 
-        currentBatl = ttk.Label(sensFrame, textvariable=self.currBat)
-        currentBatl.grid(column=3,row=3)
+        self.currentBatl = ttk.Label(sensFrame, textvariable=self.currBat)
+        self.currentBatl.grid(column=3,row=3)
 
-        startMeasB = ttk.Button(self,text="Starte Messung",command=self.startMeas)
-
+        startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.startMeas)
+        startMeasB.grid(column=3,row=4)
+        
     def startMeas(self):
         self.checkVoltage()
-        self.checkCellVoltage()
+        #self.checkCellVoltage()
         self.checkCurrent()
+        #self.i2c_getvoltageData()
 
+    #Befehl in Verbindung mit I2C-Bus
     def checkVoltage(self):
-        #Befehl in Verbindung mit I2C-Bus
         self.voltBat.set(self.i2c_getvoltageData())
-        self.after(100,self.checkVoltage)
+        self.voltageBatl.after(100,self.checkVoltage)
 
     def checkCellVoltage(self):
-        self.voltCell.set(self.voltage_meas / EepromDataDict["cellsInSer"])
-        self.after(100,self.checkCellVoltage)
+        self.voltCell.set(int(self.voltBat.get) / EepromDataDict["cellsInSer"])
+        self.vcl.after(100,self.checkCellVoltage)
 
     def checkCurrent(self):
         #Befehl in Verbindung mit I2C-Bus
         self.currBat.set(self.i2c_getCurrentData())
-        self.after(100,self.checkCurrent)
+        self.currentBatl.after(100,self.checkCurrent)
 
     def i2c_getvoltageData(self):
         self.i2c_bus.write_byte(self.i2cadress,0x01)
         val = self.i2c_bus.read_byte(self.i2cadress)
+        #self.voltBat.set(val)
+        #self.voltageBatl.after(100,self.i2c_getvoltageData)
         return val
     
     def i2c_getCurrentData(self):

@@ -14,9 +14,6 @@ from EepromData import *
 START_BIT = 0x02
 STOP_BIT = 0x03
 
-testList = [0x55, 0x30,0x28,1]
-
-
 class SensorRead(ttk.Frame):
     def __init__(self,parent):
         self.i2c_bus = SMBus(1)
@@ -194,8 +191,6 @@ class EepromControl():
         
     def readAllRegisters(self):
         self.sendPackage(uartCMD["eepromReadAll"],0,1)
-        for list in testList:
-            self.receivePackage()
 
     def writeSingleRegister(self,adress,content):
         self.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)

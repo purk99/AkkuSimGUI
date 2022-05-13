@@ -95,7 +95,6 @@ class SensorRead(ttk.Frame):
     def getCurrBat(self):
         return self.currBat
 
-
 class Countdown(ttk.Frame):
     def __init__(self,parent,duration):
         ttk.Frame.__init__(self, parent)
@@ -207,3 +206,6 @@ class EepromControl():
     #muss noch zu Ende geschrieben werden
     def readOverVoltage(self):
         self.sendPackage(uartCMD)
+
+class INA226():
+    pass

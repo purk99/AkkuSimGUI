@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import ttk
 import time
 from time import sleep
+from numpy import int16, uint16
 #from anyio import start_blocking_portal
 import serial
 from smbus2 import SMBus
@@ -16,6 +17,8 @@ STOP_BIT = 0x03
 
 class SensorRead(ttk.Frame):
     def __init__(self,parent):
+        self.i2cmeas = INA226()
+
         self.i2c_bus = SMBus(1)
         self.i2cadress = 0x31
         #i2c_sense.write_byte_data(i2cadressb,IOCON,0x02) 
@@ -51,9 +54,17 @@ class SensorRead(ttk.Frame):
         self.currentBatl = ttk.Label(sensFrame, textvariable=self.currBat)
         self.currentBatl.grid(column=3,row=3)
 
-        startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.startMeas)
+        startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.checkMeas)
         startMeasB.grid(column=3,row=4)
         
+ 
+
+    def checkMeas(self):
+        self.voltBat.set(self.i2cmeas.ina226_getBusVoltage())
+        self.currBat.set(self.i2cmeas.ina226_getCurr())
+        self.voltCell.set(self.voltCell.get/5)
+        self.voltageBatl.after(100,self.checkMeas)
+
     def startMeas(self):
         self.checkVoltage()
         #self.checkCellVoltage()
@@ -208,4 +219,58 @@ class EepromControl():
         self.sendPackage(uartCMD)
 
 class INA226():
-    pass
+    def __init__(self):
+        self.ina226 = SMBus(1)
+        self.ina226_adress = 0x40
+
+        self.ina226_config_reg =    0   #R/W
+        self.ina226_shunt_reg =     1   #R
+        self.ina226_bus_reg =       2   #R
+        self.ina226_power_reg =     3   #R
+        self.ina226_curr_reg =      4   #R
+        self.ina226_cal_reg =       5   #R/W
+
+        self.regVal = uint16
+        self.currentLSB = None
+        self.cal = None
+
+        #Werte zum Testen
+        self.ina226_calibrateReg(1,0.01)
+
+    #Auslesen von Register 
+    def ina226_readReg(self,adress):
+        self.ina226.write_byte(self.ina226_adress,adress)
+        self.regVal = self.ina226.read_byte(adress) << 8
+        self.regVal |= self.ina226.read_byte(adress)
+        return self.regVal
+
+    def ina226_writeReg(self,adress,content = int16):
+        self.ina226.write_byte(self.ina226,adress)
+        self.ina226.write_byte(self.ina226_adress,content >> 8)
+        self.ina226.write_byte(self.ina226_adress,content & 0xff)
+        
+
+    def ina226_getShuntVoltage(self):
+        return float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6)/2)
+
+    def ina226_getBusVoltage(self):
+        return float(self.ina226_readReg(self.ina226_bus_reg) * 1.25e-3)
+
+    def ina226_getCurr(self):
+        return float(self.ina226_readReg(self.ina226_curr_reg)*self.currentLSB)
+
+    def getPower(self):
+        return float(self.ina226_readReg(self.ina226_power_reg)*25*self.currentLSB)
+
+    #eventuell currentLSB fest berechnen, wenn mit 20A gerechnet wird
+    def ina226_calibrateReg(self, maxExpectCurr,rShunt):
+        self.currentLSB = maxExpectCurr/(2^15)
+        self.cal = 0.00512/(self.currentLSB*rShunt)
+
+        self.ina226_writeReg(self.ina226_adress,self.cal)
+
+
+
+    
+
+

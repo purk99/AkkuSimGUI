@@ -5,6 +5,7 @@ from time import sleep
 from timer import *
 from tools import SensorRead
 
+
 root = Tk()
 root.title("Testfenster")
 

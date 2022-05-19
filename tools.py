@@ -1,9 +1,9 @@
-#V1.1.4
+#V1.1.6
 from threading import Thread
 from tkinter import *
 from tkinter import ttk
 from time import sleep
-from numpy import byte, float16, int16, uint16
+from numpy import byte, float16, int16, uint16, uint8
 import serial
 from smbus2 import SMBus
 
@@ -33,7 +33,7 @@ class SensorRead(ttk.Frame):
         #I2C Ende
 
         #Werte zum Testen
-        self.ina226_calibrateReg(1,0.01)
+        #self.ina226_calibrateReg(1,0.01)
 
         #self.i2c_bus = SMBus(1)
         #self.i2cadress = 0x31
@@ -72,8 +72,13 @@ class SensorRead(ttk.Frame):
 
         startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.checkMeas)
         startMeasB.grid(column=3,row=4)
+
+        calB = ttk.Button(sensFrame,text="Kalibrierung",command=self.calib)
+        calB.grid(column=3,row=5)
         
- 
+    def calib(self):
+        self.ina226_writeReg(self.ina226_cal_reg,10000)
+        print(self.ina226_readReg(self.ina226_cal_reg))
 
     def checkMeas(self):
         #self.voltageBatl.configure(text = self.ina226_getBusVoltage())
@@ -106,9 +111,15 @@ class SensorRead(ttk.Frame):
         return regVal
 
     def ina226_writeReg(self,adress,content = int16):
-        self.ina226.write_byte(self.ina226_adress,adress)
-        self.ina226.write_byte(self.ina226_adress,content >> 8)
-        self.ina226.write_byte(self.ina226_adress,content & 0xFF)
+        #self.ina226.write_byte(self.ina226_adress,adress)
+        #self.ina226.write_byte(self.ina226_adress,content >> 8)
+        #self.ina226.write_byte(self.ina226_adress,content & 0xFF)
+        #contentInBytes = list((uint8(content >> 8),uint8(content & 0xFF)))
+        #contentInBytes = [0x1,0x2]
+        #self.ina226.write_i2c_block_data(self.ina226_adress,adress,contentInBytes)
+        #self.ina226.write_word_data(self.ina226_adress,adress,content)
+        self.ina226.write_2_bytes(self.ina226_adress,adress,content)
+        
 
     def ina226_getShuntVoltage(self):
         #self.ina226.write_byte(self.ina226_adress,self.ina226_bus_reg)
@@ -132,7 +143,8 @@ class SensorRead(ttk.Frame):
     #eventuell currentLSB fest berechnen, wenn mit 20A gerechnet wird
     def ina226_calibrateReg(self, maxExpectCurr = uint16,rShunt = float16):
         self.currentLSB = maxExpectCurr/(2**15)
-        self.cal = 0.00512/(self.currentLSB*rShunt)
+        self.cal = int16(0.00512/(self.currentLSB*rShunt))
+
         print(self.currentLSB,end='\t')
         print(self.cal)
         self.ina226_writeReg(self.ina226_cal_reg,self.cal)

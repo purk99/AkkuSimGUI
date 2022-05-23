@@ -9,8 +9,12 @@ from smbus2 import SMBus
 from EepromData import *
 from pigpio import *
 
+START_BIT = 0x02
+STOP_BIT = 0x03
+
 
 class SensorRead(ttk.Frame):
+
     def __init__(self,parent):
 
         #I2C-Kommunikation initialisieren
@@ -105,19 +109,16 @@ class SensorRead(ttk.Frame):
         #self.ina226.i2c_write_byte(h,adress)
         recVal =    uint16(self.ina226.i2c_read_word_data(h,adress))
         regVal =    uint16((recVal >> 8)|(recVal << 8))
+        self.ina226.i2c_close(h)
         return regVal
 
     def ina226_writeReg(self,adress,content = int16):
         h = self.ina226.i2c_open(1,self.ina226_adress)
         test = [content >> 8, content & 0xff]
         self.ina226.i2c_write_i2c_block_data(h,adress,test)
-        print("(writeReg)Sendebuffer Inhalt: ",end='\n')
-        print(content)
+        self.ina226.i2c_close(h)
 
     def ina226_getShuntVoltage(self):
-        #self.ina226.write_byte(self.ina226_adress,self.ina226_bus_reg)
-        #shuntVolt = (self.ina226.read_byte(self.ina226_adress) << 8)
-        #shuntVolt |= self.ina226.read_byte(self.ina226_adress)
         shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6)/2)
         return shuntVolt
 
@@ -136,8 +137,98 @@ class SensorRead(ttk.Frame):
     #eventuell currentLSB fest berechnen, wenn mit 20A gerechnet wird
     def ina226_calibrateReg(self, maxExpectCurr = uint16,rShunt = float16):
         self.currentLSB = maxExpectCurr/(2**15)
-        self.cal = int16(0.00512/(self.currentLSB*rShunt))
-
-        print(self.currentLSB,end='\t')
-        print(self.cal)
+        self.cal = uint16(0.00512/(self.currentLSB*rShunt))
         self.ina226_writeReg(self.ina226_cal_reg,self.cal)
+
+
+class Countdown(ttk.Frame):
+    def __init__(self,parent,duration):
+        ttk.Frame.__init__(self, parent)
+        #super().__init__()
+        
+        self.grid()
+
+        #variable für Ausgabe
+        #ÄNDERN AUF 30, NUR ZUM TESTEN AUF 10
+        self.dur = duration
+        self.durStart = self.dur
+        self.secFormat = self.dur
+
+        self.tl = ttk.Label(self, text=self.secFormat)
+        self.tl.grid(column=2,row=1)
+
+        self.sb = ttk.Button(self,text="Counter starten", command = self.countdown)
+        self.sb.grid(column=1,row=1)
+
+###########################################################
+###         damit über mehrere Funktionen auf Variablen
+###         zugegriffen werden kann
+###         --> self. vor jede variable, damit wird
+##                          Klassenvariable erzeugt
+
+    #Hier wird countdown erzeugt
+    #callback nach 1s auf Funktion selbst
+    #--> python after()
+    def countdown(self):
+        if self.dur >= 0:   
+            self.secFormat = '{:02d}'.format(self.dur)
+            self.tl.after(1000,self.countdown)
+            #schedule timer to update icon every second
+            self.tl.configure(text=self.secFormat)
+            self.dur -= 1
+        #um Timer wieder starten zu können
+        #self.dur wird auf durStart +1 gesetzt, damit Variablen 
+        #in Abhängigkeit von self.dur nicht sofort wieder umspringen, sondern erst nach neuem Start
+        else:
+            self.dur = self.durStart + 1
+    
+    #Hilfsfunktionen
+    def getTime(self):
+        return self.dur
+    def getStartDur(self):
+        return self.durStart
+
+#für UART-Kommunikation
+class EepromControl():
+    def __init__(self):
+        #super().__init__()
+        self.sendBuffer = bytearray(5)
+        self.receiveBuffer = bytearray(3)
+        self.ser = serial.Serial("/dev/ttyS0", 9600)
+
+    def sendPackage(self,id,adress,content):
+        self.sendBuffer[0] = START_BIT
+        self.sendBuffer[1] = id
+        self.sendBuffer[2] = adress
+        self.sendBuffer[3] = content
+        self.sendBuffer[4] = STOP_BIT
+        self.ser.write(self.sendBuffer)
+
+    def receivePackage(self):
+        self.receiveBuffer = self.ser.read(3)
+        
+        payload = (self.receiveBuffer[1])
+        if self.receiveBuffer[0] == START_BIT & self.receiveBuffer[2] == STOP_BIT:
+            return payload
+
+    def readSingleRegister(self,adress):
+        self.sendPackage(uartCMD["eepromReadSingleReg"], adress, 1)
+        
+    def readAllRegisters(self):
+        self.sendPackage(uartCMD["eepromReadAll"],0,1)
+
+    def writeSingleRegister(self,adress,content):
+        self.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)
+
+    def readNTC(self):
+        self.sendPackage(uartCMD["readNTC"],1,1)
+        rec = self.receivePackage()
+        ntcVal = rec[0]
+        return ntcVal
+
+    def writeNTC(self):
+        self.sendPackage(uartCMD["writeNTC"],1,InfoData[0])
+
+    #muss noch zu Ende geschrieben werden
+    def readOverVoltage(self):
+        self.sendPackage(uartCMD)

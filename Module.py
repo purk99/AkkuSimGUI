@@ -7,7 +7,7 @@ from moduleSpannung import *
 from moduleEeprom import *
 from moduleTemp import ModulTempHysterese, ModulTempNTCError
 from moduleKapazität import *
-from tools import *
+from tools_V21 import *
 
 class ModulSpannung(Toplevel):
     def __init__(self, master = None):

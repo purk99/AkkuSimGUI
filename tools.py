@@ -148,40 +148,6 @@ class SensorRead(ttk.Frame):
         print(self.currentLSB,end='\t')
         print(self.cal)
         self.ina226_writeReg(self.ina226_cal_reg,self.cal)
-'''
-    def startMeas(self):
-        self.checkVoltage()
-        #self.checkCellVoltage()
-        self.checkCurrent()
-        #self.i2c_getvoltageData()
-
-    #Befehl in Verbindung mit I2C-Bus
-    def checkVoltage(self):
-        self.voltBat.set(self.i2c_getvoltageData())
-        self.voltageBatl.after(100,self.checkVoltage)
-
-    def checkCellVoltage(self):
-        self.voltCell.set(int(self.voltBat.get) / EepromDataDict["cellsInSer"])
-        self.vcl.after(100,self.checkCellVoltage)
-
-    def checkCurrent(self):
-        #Befehl in Verbindung mit I2C-Bus
-        self.currBat.set(self.i2c_getCurrentData())
-        self.currentBatl.after(100,self.checkCurrent)
-
-    def i2c_getvoltageData(self):
-        self.i2c_bus.write_byte(self.i2cadress,0x01)
-        val = self.i2c_bus.read_byte(self.i2cadress)
-        #self.voltBat.set(val)
-        #self.voltageBatl.after(100,self.i2c_getvoltageData)
-        return val
-    
-    def i2c_getCurrentData(self):
-        self.i2c_bus.write_byte(self.i2cadress,0x02)
-        val = self.i2c_bus.read_byte(self.i2cadress)
-        return val
-
-        '''
 
 class Countdown(ttk.Frame):
     def __init__(self,parent,duration):
@@ -208,7 +174,7 @@ class Countdown(ttk.Frame):
 ###         --> self. vor jede variable, damit wird
 ##                          Klassenvariable erzeugt
 
-    #Hier wird countdown erzeugt+
+    #Hier wird countdown erzeugt
     #callback nach 1s auf Funktion selbst
     #--> python after()
     def countdown(self):

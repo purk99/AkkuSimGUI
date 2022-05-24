@@ -82,9 +82,12 @@ class SensorRead(ttk.Frame):
         calB.grid(column=3,row=5)
         
     def calib(self):
+        #Config-register beschreiben
+        #0100 0101 1010 1111 = 0x45AF
         self.ina226_writeReg(self.ina226_config_reg,0x45AF)
+
+        #Kalibrierungsregister beschreiben
         self.ina226_calibrateReg(5,0.01)
-        print(self.ina226_readReg(self.ina226_cal_reg))
 
     def checkMeas(self):
         #self.voltageBatl.configure(text = self.ina226_getBusVoltage())
@@ -114,6 +117,12 @@ class SensorRead(ttk.Frame):
         self.ina226.i2c_write_i2c_block_data(h,adress,test)
         self.ina226.i2c_close(h)
 
+    #eventuell currentLSB fest berechnen, wenn mit 20A gerechnet wird
+    def ina226_calibrateReg(self, maxExpectCurr = uint16,rShunt = float16):
+        self.currentLSB = maxExpectCurr/(2**15)
+        self.cal = uint16(0.00512/(self.currentLSB*rShunt))
+        self.ina226_writeReg(self.ina226_cal_reg,self.cal)
+
     def ina226_getShuntVoltage(self):
         shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6) + (self.shuntVoltOffset*2.5e-6))
         return round(shuntVolt,4)
@@ -129,12 +138,6 @@ class SensorRead(ttk.Frame):
     def getPower(self):
         busPow = float(self.ina226_readReg(self.ina226_power_reg)*25*self.currentLSB + self.powerOffset)
         return busPow
-
-    #eventuell currentLSB fest berechnen, wenn mit 20A gerechnet wird
-    def ina226_calibrateReg(self, maxExpectCurr = uint16,rShunt = float16):
-        self.currentLSB = maxExpectCurr/(2**15)
-        self.cal = uint16(0.00512/(self.currentLSB*rShunt))
-        self.ina226_writeReg(self.ina226_cal_reg,self.cal)
 
     def getVoltageBat(self):
         return self.voltBat

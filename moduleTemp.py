@@ -2,7 +2,7 @@
 from tkinter import *
 from tkinter import ttk
 
-from tools import *
+from tools_V21 import *
 from EepromData import *
 
 class ModulTempHysterese(ttk.Frame):

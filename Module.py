@@ -7,6 +7,7 @@ from moduleSpannung import *
 from moduleEeprom import *
 from moduleTemp import ModulTempHysterese, ModulTempNTCError
 from moduleKapazität import *
+from moduleCalibration import *
 from tools_V21 import *
 
 class ModulSpannung(Toplevel):
@@ -117,8 +118,8 @@ class ModulKalibrierung(Toplevel):
 
         ttk.Label(self.modulframe, text="Kalibrierungsmodul", padding=10, font='20').grid(column=1,row=0)
 
-        cal = SensorRead(self.modulframe)
-        cal.grid(column=0,row=1)
+        cal = ModulKalibirerungAllgemein(self)
+        cal.grid(column=0,row=2)
 
         eb = ttk.Button(self.modulframe,text="Fenster schließen",command=self.destroy)
         eb.grid(column=10,row=10) 

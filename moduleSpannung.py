@@ -6,7 +6,7 @@ from unittest import TestCase
 
 from click import style
 
-from tools import *
+from tools_V21 import *
 
 class ModulSpannungTEntladung(ttk.Frame):
     def __init__(self,parent):

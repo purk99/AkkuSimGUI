@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import font
 
-from tools import *
+from tools_V21 import *
 from EepromData import *
 from EepromAccess import *
 

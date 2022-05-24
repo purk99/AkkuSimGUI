@@ -1,11 +1,10 @@
 from math import ceil
-from pickletools import uint8
 import string
-from numpy import char, float16, int16, uint16
+from numpy import char, float16, int16, uint16, uint8
 import pigpio
 
-val1 = uint16(4135)
-val2 = uint16((val1 >> 8) | (val1 << 8))
+val1 = uint8(0x50)
+val2 = val1 >> 4
 
 print("Value 1: ")
 print(val1,end='\n')

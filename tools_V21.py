@@ -12,7 +12,6 @@ from pigpio import *
 START_BIT = 0x02
 STOP_BIT = 0x03
 
-
 class SensorRead(ttk.Frame):
 
     def __init__(self,parent):
@@ -43,6 +42,11 @@ class SensorRead(ttk.Frame):
         self.voltBat = float(10)
         self.voltCell = float(10)
         self.currBat = float(10)
+
+        self.busVoltOffset = 0
+        self.shuntVoltOffset = 0
+        self.busCurrOffset = 0
+        self.powerOffset = 0
         
         #dummywerte
         #self.voltage_meas = 18
@@ -78,7 +82,8 @@ class SensorRead(ttk.Frame):
         calB.grid(column=3,row=5)
         
     def calib(self):
-        self.ina226_writeReg(self.ina226_cal_reg,10000)
+        self.ina226_writeReg(self.ina226_config_reg,0x45AF)
+        self.ina226_calibrateReg(5,0.01)
         print(self.ina226_readReg(self.ina226_cal_reg))
 
     def checkMeas(self):
@@ -93,15 +98,6 @@ class SensorRead(ttk.Frame):
         self.currentBatl.configure(text = self.ina226_getCurr())
         self.voltageCelll.configure(text = self.ina226_getShuntVoltage())
         self.voltageBatl.configure(text = self.ina226_getBusVoltage())
-
-    def getVoltageBat(self):
-        return self.voltBat
-
-    def getVoltageCell(self):
-        return self.voltCell
-
-    def getCurrBat(self):
-        return self.currBat
 
     #Auslesen von Register 
     def ina226_readReg(self,adress):
@@ -119,19 +115,19 @@ class SensorRead(ttk.Frame):
         self.ina226.i2c_close(h)
 
     def ina226_getShuntVoltage(self):
-        shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6)/2)
-        return shuntVolt
+        shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6) + (self.shuntVoltOffset*2.5e-6))
+        return round(shuntVolt,4)
 
     def ina226_getBusVoltage(self):
-        busVolt = float(self.ina226_readReg(self.ina226_bus_reg) * 1.25e-3)
-        return busVolt
+        busVolt = float(self.ina226_readReg(self.ina226_bus_reg) * 1.25e-3 + self.busVoltOffset)
+        return round(busVolt,2)
 
     def ina226_getCurr(self):
-        busCurr = float(self.ina226_readReg(self.ina226_curr_reg)*self.currentLSB)
-        return busCurr
+        busCurr = float(self.ina226_readReg(self.ina226_curr_reg)*self.currentLSB + self.busCurrOffset)
+        return round(busCurr,2)
 
     def getPower(self):
-        busPow = float(self.ina226_readReg(self.ina226_power_reg)*25*self.currentLSB)
+        busPow = float(self.ina226_readReg(self.ina226_power_reg)*25*self.currentLSB + self.powerOffset)
         return busPow
 
     #eventuell currentLSB fest berechnen, wenn mit 20A gerechnet wird
@@ -139,6 +135,27 @@ class SensorRead(ttk.Frame):
         self.currentLSB = maxExpectCurr/(2**15)
         self.cal = uint16(0.00512/(self.currentLSB*rShunt))
         self.ina226_writeReg(self.ina226_cal_reg,self.cal)
+
+    def getVoltageBat(self):
+        return self.voltBat
+
+    def getVoltageCell(self):
+        return self.voltCell
+
+    def getCurrBat(self):
+        return self.currBat
+    
+    def setShuntOffset(self,offset):
+        self.shuntVoltOffset = offset
+    
+    def setBusVoltOffset(self,offset):
+        self.busVoltOffset = offset
+    
+    def setBusCurrOffset(self,offset):
+        self.busCurrOffset = offset
+
+    def setBusPowerOffset(self,offset):
+        self.powerOffset = offset
 
 
 class Countdown(ttk.Frame):
@@ -232,3 +249,14 @@ class EepromControl():
     #muss noch zu Ende geschrieben werden
     def readOverVoltage(self):
         self.sendPackage(uartCMD)
+
+#Ermöglicht Konvertieren von EEPROM Werten in auslesbare Werte
+class HexValConvert():
+    def __init__(self):
+        dummyVal = 0
+
+    def shiftLeftByXPos(self,startVal,howMany):
+        return uint8(startVal << howMany)
+
+    def shiftRightByXPos(self,startVal,howMany):
+        return uint8(startVal >> howMany)

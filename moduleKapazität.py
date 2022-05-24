@@ -3,7 +3,7 @@
 from tkinter import *
 from tkinter import ttk
 
-from tools import SensorRead
+from tools_V21 import SensorRead
 
 class ModulCapCapacity(ttk.Frame):
     def __init__(self,parent):

@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 from EepromData import *
-from tools import EepromControl
+from tools_V21 import EepromControl
 
 
 class EepromInfo(Toplevel):
@@ -157,8 +157,8 @@ class EepromChargeParam(ttk.Frame):
         #self.chargeParamselect + 10 -> ab Pos 10 fängt EepromDataCharge an
         EepromDataComplete[self.chargeParamSelect+10] = EepromDataCharge[self.chargeParamSelect]
         #aktualisierung Aller Parameter in GUI
-        print(EepromDataCharge[self.chargeParamSelect],end="\n")
-        print(EepromDataComplete[self.chargeParamSelect+10])
+        #print(EepromDataCharge[self.chargeParamSelect],end="\n")
+        #print(EepromDataComplete[self.chargeParamSelect+10])
         self.updateChargeLabels()
         #Eeprom-Daten auf Arduino überschreiben
         self.changeEepromData(self.chargeParamSelect+10,EepromDataCharge[self.chargeParamSelect])

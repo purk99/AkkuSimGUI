@@ -58,19 +58,25 @@ class ModulKalibirerungAllgemein(ttk.Frame):
 
     def calibrateMeas_Add(self):
         switchVal = self.calSelectCombo.current()
-        match switchVal:
-            case 0: self.meas.setShuntOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
-            case 1: self.meas.setBusVoltOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
-            case 2: self.meas.setBusCurrOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
-            case 3: self.meas.setBusPowerOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+        if switchVal == 0:
+           self.meas.setShuntOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+        if switchVal == 1:
+            self.meas.setBusVoltOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+        if switchVal == 2:
+            self.meas.setBusCurrOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+        if switchVal == 3:
+            self.meas.setBusPowerOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
 
     def calibrateMeas_Subtract(self):
         switchVal = self.calSelectCombo.current()
-        match switchVal:
-            case 0: self.meas.setShuntOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
-            case 1: self.meas.setBusVoltOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
-            case 2: self.meas.setBusCurrOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
-            case 3: self.meas.setBusPowerOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+        if switchVal == 0:
+            self.meas.setShuntOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+        if switchVal == 1:
+            self.meas.setBusVoltOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+        if switchVal == 2:
+            self.meas.setBusCurrOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+        if switchVal == 3:
+            self.meas.setBusPowerOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
         
         
 

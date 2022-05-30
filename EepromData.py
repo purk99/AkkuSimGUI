@@ -116,4 +116,4 @@ EepromDataCycle = [ EepromDataDict["numCCstart1"],
 
 EepromDataValues = list(range(255))
 CalibrationFine = list(arange(0,1,0.1))
-CalibrationCoarse = list(range(0,1000))
+CalibrationCoarse = list(range(0,6))

@@ -53,11 +53,12 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         self.calValCoarseCombo = ttk.Combobox(self,values=CalibrationFine)
         self.calValCoarseCombo.grid(column=2,row=7)
 
-        ttk.Button(self,text="Aufaddieren").grid(column=0,row=8)
-        ttk.Button(self,text="Abziehen").grid(column=1,row=8)
+        ttk.Button(self,text="Aufaddieren", command=self.calibrateMeas_Add).grid(column=0,row=8)
+        ttk.Button(self,text="Abziehen", command=self.calibrateMeas_Subtract).grid(column=1,row=8)
 
     def calibrateMeas_Add(self):
         switchVal = self.calSelectCombo.current()
+        print(switchVal)
         if switchVal == 0:
            self.meas.setShuntOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
         if switchVal == 1:

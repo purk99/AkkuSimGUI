@@ -32,12 +32,6 @@ class SensorRead(ttk.Frame):
         self.cal = int16
         #I2C Ende
 
-        #Werte zum Testen
-        #self.ina226_calibrateReg(1,0.01)
-
-        #self.i2c_bus = SMBus(1)
-        #self.i2cadress = 0x31
-        #i2c_sense.write_byte_data(i2cadressb,IOCON,0x02) 
 
         self.voltBat = float(10)
         self.voltCell = float(10)

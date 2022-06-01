@@ -13,8 +13,6 @@
 
 from numpy import arange
 
-
-
 ###Commands für Arduino
 uartCMD = {
     "eepromReadSingleReg"   :   0x01,
@@ -23,7 +21,9 @@ uartCMD = {
     "ntcRead"               :   0x04,
     "ntcWrite"              :   0x05,
     "voltageProtectRead"    :   0x06,
-    "voltageProtectWrite"   :   0x07
+    "voltageProtectWrite"   :   0x07,
+    "setEepromToNormalState":   0x08,
+    "setEepromToSmallState" :   0x09
 }
 
 ###Startwerte für alle Listen###

@@ -166,7 +166,7 @@ class EepromChargeParam(ttk.Frame):
     #Änderung von Parametern auf Arduino
     def changeEepromData(self,adress,content):
         arduninoEeprom = EepromControl()
-        arduninoEeprom.sendPackage(uartCMD["WriteSingleReg"],adress,content)
+        arduninoEeprom.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)
 
     def changeVarCharge(self):
         

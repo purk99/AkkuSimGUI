@@ -208,13 +208,13 @@ class EepromControl():
         #super().__init__()
         self.sendBuffer = bytearray(5)
         self.receiveBuffer = bytearray(3)
-        self.ser = serial.Serial("/dev/ttyS0", 9600)
+        self.ser = serial.Serial("/dev/ttyAMA0", 9600)
 
     def sendPackage(self,id,adress,content):
         self.sendBuffer[0] = START_BIT
         self.sendBuffer[1] = id
-        self.sendBuffer[2] = adress
-        self.sendBuffer[3] = content
+        self.sendBuffer[2] = uint8(adress)
+        self.sendBuffer[3] = uint8(content)
         self.sendBuffer[4] = STOP_BIT
         self.ser.write(self.sendBuffer)
 
@@ -223,11 +223,13 @@ class EepromControl():
         
         payload = (self.receiveBuffer[1])
         if self.receiveBuffer[0] == START_BIT & self.receiveBuffer[2] == STOP_BIT:
-            return payload
+            return uint8(payload)
 
     def readSingleRegister(self,adress):
         self.sendPackage(uartCMD["eepromReadSingleReg"], adress, 1)
-        
+        return self.receivePackage()
+
+    #unbenutzte Funktion        
     def readAllRegisters(self):
         self.sendPackage(uartCMD["eepromReadAll"],0,1)
 

@@ -12,7 +12,7 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         self.grid()
 
         self.meas = SensorRead(self)
-        #self.meas.grid(column=5,row=1)
+        self.meas.grid(column=0,row=1)
 
         infoL = ttk.Label(self,text="Mit genauem Netzteil kalibrieren!")
         infoL.grid(column=1,row=1)

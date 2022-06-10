@@ -9,6 +9,8 @@ class ModulTempHysterese(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
 
+        #neuer Kommentar
+
         headLabel = ttk.Label(self,text="Temperaturgesteuerte Stromhysterese")
         headLabel.grid(column=1,row=0)
 

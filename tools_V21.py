@@ -12,6 +12,8 @@ from pigpio import *
 START_BIT = 0x02
 STOP_BIT = 0x03
 
+#neuer Kommentar
+
 class SensorRead(ttk.Frame):
 
     def __init__(self,parent):

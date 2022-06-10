@@ -19,9 +19,9 @@ counter = 0
 counter1 = 0
 
 for i in fields:
-    ttk.Separator(frame,orient=VERTICAL).grid(column=(counter*2)+1,row=counter1)
+    #ttk.Separator(frame,orient=VERTICAL).grid(column=(counter*2)+1,row=counter1)
     ttk.Label(frame, text=fields[i]).grid(column=counter*2,row=counter1)
-    #ttk.Label(frame,text=100-fields[i]).grid(column=(counter*2)+2,row=counter1)
+    ttk.Label(frame,text=100-fields[i]).grid(column=(counter*2)+1,row=counter1)
     counter1 += 1
     if fields[i]%10 == 9:
         counter += 1

@@ -13,14 +13,14 @@ class ModulTempHysterese(ttk.Frame):
         headLabel.grid(column=1,row=0)
 
         self.ug = 5
-        ttk.Label(self,text="Untere Grenze").grid(column=0,row=2)
-        ogL = ttk.Label(self,text=self.ug)
-        ogL.grid(column=1,row=2)
+        ttk.Label(self,text="Starttemperatur").grid(column=0,row=1)
+        self.ogL = ttk.Combobox(self,textvariable=TempDataValues)
+        self.ogL.grid(column=1,row=1)
 
         self.og = 10
-        ttk.Label(self,text="Obere Grenze").grid(column=0,row=3)
-        ugL = ttk.Label(self,text=self.og)
-        ugL.grid(column=1,row=3)
+        ttk.Label(self,text="Endtemperatur").grid(column=0,row=3)
+        self.ugL = ttk.Label(self,text=self.og)
+        self.ugL.grid(column=1,row=3)
 
         self.tempAktuell = self.ug
         ttk.Label(self,text="Aktuelle Temperatur").grid(column=0,row=4)
@@ -54,38 +54,38 @@ class ModulTempNTCError(ttk.Frame):
         #erst auf Raspbi aktivieren, sonst Error
         self.comm = EepromControl()
 
+        self.meas = SensorRead(self)
+        self.meas.grid(column=1,row=1)
+
         headLabel = ttk.Label(self,text="Prüfmodul NTC Error", font='20')
         headLabel.grid(column=1,row=0)
 
-        shortB = ttk.Button(self,text="NTC kurzgeschlossen",command=self.shortNTC)
-        shortB.grid(column=0,row=1)
+        self.shortB = ttk.Button(self,text="NTC kurzschließen",command=self.shortNTC)
+        self.shortB.grid(column=0,row=1)
 
-        discB = ttk.Button(self,text="NTC ausgesteckt", command=self.discNTC)
-        discB.grid(column=0,row=2)
+        self.discB = ttk.Button(self,text="NTC ausstecken", command=self.discNTC)
+        self.discB.grid(column=0,row=2)
+
+        self.infoL = ttk.Label(self,text="NTC Normalzustand")
+        self.infoL.grid(column=0,row=5)
 
     def shortNTC(self):
-        ###0x25 ist nur Platzhalter
-        #test = self.comm.readSingleRegister(0x25)
-        test = 0x0
+        test = self.comm.readSingleRegister(0x2)
 
         if test != 0xf0:
             test = 0xf0
 
-        #self.comm.writeSingleRegister(0x26,0x25,test)
+        self.comm.writeSingleRegister(0x2,test)
 
-        infoLabel = ttk.Label(self.modulframe,text="Display prüfen, NTC kurzgeschlossen")
-        infoLabel.grid(column=0,row=5)
+        self.infoL.configure(text="NTC kurzgeschlossen")
 
     def discNTC(self):
-        ###0x25 ist nur Platzhalter
-        #test = self.comm.readSingleRegister(0x25)
+        test = self.comm.readSingleRegister(0x2)
         test = 0
 
         if test != 0x0f:
             test = 0x0f
 
-        #self.comm.writeSingleRegister(0x26,0x25,test)
-
-        infoLabel = ttk.Label(self.modulframe, text="Display prüfen, NTC disconnect")
-        infoLabel.grid(column=0,row=5)
+        self.comm.writeSingleRegister(0x2,test)
+        self.infoL.configure(text="NTC ausgesteckt")
 

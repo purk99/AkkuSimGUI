@@ -84,16 +84,14 @@ class SensorRead(ttk.Frame):
         self.ina226_calibrateReg(5,0.01)
 
     def checkMeas(self):
-        #self.voltageBatl.configure(text = self.ina226_getBusVoltage())
-        #self.currentBatl.configure(text = self.ina226_getCurr())
-        #self.voltageCelll.configure(text = self.voltCell/5)
         self.test()
         self.voltageBatl.after(100,self.checkMeas)
 
     #Testfunktion zum Prüfen der Funktion von I2C Kommunikation
     def test(self):
+        cellVoltage = self.ina226_getBusVoltage()/int(EepromDataComplete[2])
         self.currentBatl.configure(text = self.ina226_getCurr())
-        self.voltageCelll.configure(text = self.ina226_getShuntVoltage())
+        self.voltageCelll.configure(text = cellVoltage)
         self.voltageBatl.configure(text = self.ina226_getBusVoltage())
 
     #Auslesen von Register 

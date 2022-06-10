@@ -259,3 +259,6 @@ class HexValConvert():
 
     def shiftRightByXPos(self,startVal,howMany):
         return uint8(startVal >> howMany)
+
+    def convertNTCTempToDec(self,temp):
+        return 200-(temp*3)

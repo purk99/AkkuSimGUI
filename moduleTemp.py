@@ -2,50 +2,80 @@
 from tkinter import *
 from tkinter import ttk
 
-from tools_V21 import *
+#from tools_V21 import *
 from EepromData import *
 
 class ModulTempHysterese(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
 
-        #neuer Kommentar
-
-        headLabel = ttk.Label(self,text="Temperaturgesteuerte Stromhysterese")
-        headLabel.grid(column=1,row=0)
-
-        self.ug = 5
-        ttk.Label(self,text="Starttemperatur").grid(column=0,row=1)
-        self.ogL = ttk.Combobox(self,textvariable=TempDataValues)
-        self.ogL.grid(column=1,row=1)
-
-        self.og = 10
-        ttk.Label(self,text="Endtemperatur").grid(column=0,row=3)
-        self.ugL = ttk.Label(self,text=self.og)
-        self.ugL.grid(column=1,row=3)
-
-        self.tempAktuell = self.ug
-        ttk.Label(self,text="Aktuelle Temperatur").grid(column=0,row=4)
-        self.tAL = ttk.Label(self,text=self.tempAktuell)
-        self.tAL.grid(column=1,row=4)
-
-        tempB = ttk.Button(self,text="Test Starten",command = self.tempHys)
-        tempB.grid(column=1, row=5)
-
         #meas = SensorRead(self)
         #meas.grid(column=10,row=10)
+
+        headLabel = ttk.Label(self,text="Temperaturgesteuerte Stromhysterese",font='10')
+        headLabel.grid(column=1,row=0)
+
+        ttk.Label(self,text="Starttemperatur").grid(column=0,row=1)
+        self.sgL = ttk.Combobox(self,values=TempDataValues)
+        self.sgL.grid(column=1,row=1)
+
+        ttk.Label(self,text="Endtemperatur").grid(column=0,row=3)
+        self.egL = ttk.Combobox(self,values=TempDataValues)
+        self.egL.grid(column=1,row=3)
+
+        ttk.Label(self,text="Schrittzeit").grid(column=0,row=4)
+        self.stepTime = ttk.Combobox(self,values=list(range(11)))
+        self.stepTime.grid(column=1,row=4)
+
+        
+
+        tempB = ttk.Button(self,text="Test Starten",command = self.tempHys)
+        tempB.grid(column=1, row=6)
+
+        ttk.Label(self,text="Manuelle Temperatureinstellung",font='10').grid(column=1,row=7)
+
+        ttk.Label(self,text="Neue Temperatur").grid(column=0,row=8)
+        self.mTempL = ttk.Combobox(self,values=TempDataValues)
+        self.mTempL.grid(column=1,row=8)
+
+        self.newTempB = ttk.Button(self,text="Temperatur einstellen",command=self.setManualTemp)
+        self.newTempB.grid(column=1,row=9)
+
+        self.tempAktuell = 0
+        ttk.Label(self,text="Aktuelle Temperatur",font='15').grid(column=0,row=10)
+        self.tAL = ttk.Label(self,text=self.tempAktuell,font='15')
+        self.tAL.grid(column=1,row=10)
 
         eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
         eb.grid(column=10,row=10)
 
     def tempHys(self):
-        if self.tempAktuell != self.og:
-            self.tAL.configure(text=self.tempAktuell)
-            self.tempAktuell += 1
-            self.tAL.after(1000,self.tempHys)
-        elif self.tempAktuell == self.og:
-            self.tAL.configure(text=self.tempAktuell)
-            self.tempAktuell = self.ug
+        stepTimeinSecs = int(self.stepTime.get())*1000
+        if int(self.egL.get()) > int(self.sgL.get()):
+            if self.tempAktuell != int(self.egL.get()):
+                self.tAL.configure(text=self.tempAktuell)
+                self.tempAktuell += 1
+                self.tAL.after(stepTimeinSecs,self.tempHys)
+            elif self.tempAktuell == int(self.egL.get()):
+                self.tAL.configure(text=self.tempAktuell)
+                self.tempAktuell = int(self.sgL.get())
+        
+        else:
+            if self.tempAktuell != int(self.egL.get()):
+                self.tAL.configure(text=self.tempAktuell)
+                self.tempAktuell -= 1
+                self.tAL.after(stepTimeinSecs,self.tempHys)
+            elif self.tempAktuell == int(self.egL.get()):
+                self.tAL.configure(text=self.tempAktuell)
+                self.tempAktuell = int(self.sgL.get())
+
+    def setManualTemp(self):
+        self.tempAktuell = int(self.mTempL.get())
+        self.tAL.configure(text=self.tempAktuell)
+
+    def setNTCinEeprom(self,temp):
+        
+        InfoData[0] = temp
 
 class ModulTempNTCError(ttk.Frame):
     def __init__(self,parent):

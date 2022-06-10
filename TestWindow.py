@@ -15,7 +15,7 @@ root.geometry("800x480")
 
 frame = ttk.Frame(root)
 frame.grid()
-
+'''
 counter = 0
 counter1 = 0
 
@@ -27,6 +27,18 @@ for i in fields:
     if fields[i]%10 == 9:
         counter += 1
         counter1 = 0
+'''
+
+def zeig():
+    val = int(z.get())
+    print(val)
+    print(type(val))
+
+t = list(range(10))
+z = ttk.Combobox(frame, values=t)
+z.grid(column=1,row=1)
+
+ttk.Button(frame, text="zeig", command=zeig).grid(column=2,row=1)
 
 root.mainloop()
 

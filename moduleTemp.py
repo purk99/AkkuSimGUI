@@ -4,10 +4,15 @@ from tkinter import ttk
 
 from tools_V21 import *
 from EepromData import *
+from EepromAccess import *
 
 class ModulTempHysterese(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
+
+        #show actual charge parameters 
+        self.chargePar = EepromChargeParam(self)
+        self.chargePar.grid(column=5,row=1)
 
         self.meas = SensorRead(self)
         self.meas.grid(column=10,row=10)

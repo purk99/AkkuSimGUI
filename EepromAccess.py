@@ -49,47 +49,47 @@ class EepromChargeParam(ttk.Frame):
         ttk.Label(self,text="Ladeparameter").grid(column=1,row=0,padx=5)
     
         ttk.Label(self,text="T_min").grid(column=0,row=1,padx=5)
-        tminLabel = ttk.Label(self,text=EepromDataCharge[0])
+        tminLabel = ttk.Label(self,text=EepromDataComplete[108])
         tminLabel.grid(column=2,row=1)
 
         ttk.Label(self,text="T_cold").grid(column=0,row=2,padx=5)
-        tcoldLabel = ttk.Label(self,text=EepromDataCharge[1])
+        tcoldLabel = ttk.Label(self,text=EepromDataComplete[109])
         tcoldLabel.grid(column=2,row=2)
 
         ttk.Label(self,text="T_warm").grid(column=0,row=3,padx=5)
-        twarmLabel = ttk.Label(self,text=EepromDataCharge[2])
+        twarmLabel = ttk.Label(self,text=EepromDataComplete[110])
         twarmLabel.grid(column=2,row=3)
 
         ttk.Label(self,text="T_max").grid(column=0,row=4,padx=5)
-        tmaxLabel = ttk.Label(self,text=EepromDataCharge[3])
+        tmaxLabel = ttk.Label(self,text=EepromDataComplete[111])
         tmaxLabel.grid(column=2,row=4)
 
         ttk.Label(self,text="U_cold").grid(column=0,row=5,padx=5)
-        ucoldLabel = ttk.Label(self,text=EepromDataCharge[4])
+        ucoldLabel = ttk.Label(self,text=EepromDataComplete[112])
         ucoldLabel.grid(column=2,row=5)
 
         ttk.Label(self,text="U_warm").grid(column=0,row=6,padx=5)
-        uwarmLabel = ttk.Label(self,text=EepromDataCharge[5])
+        uwarmLabel = ttk.Label(self,text=EepromDataComplete[113])
         uwarmLabel.grid(column=2,row=6)
 
         ttk.Label(self,text="U_max").grid(column=0,row=7,padx=5)
-        umaxLabel = ttk.Label(self,text=EepromDataCharge[6])
+        umaxLabel = ttk.Label(self,text=EepromDataComplete[114])
         umaxLabel.grid(column=2,row=7)
         
         ttk.Label(self,text="I_cold").grid(column=3,row=1,padx=5)
-        icoldLabel = ttk.Label(self,text=EepromDataCharge[7])
+        icoldLabel = ttk.Label(self,text=EepromDataComplete[115])
         icoldLabel.grid(column=4,row=1)
 
         ttk.Label(self,text="I_warm").grid(column=3,row=2,padx=5)
-        iwarmLabel = ttk.Label(self,text=EepromDataCharge[8])
+        iwarmLabel = ttk.Label(self,text=EepromDataComplete[116])
         iwarmLabel.grid(column=4,row=2)
 
         ttk.Label(self,text="I_max").grid(column=3,row=3,padx=5)
-        imaxLabel = ttk.Label(self,text=EepromDataCharge[9])
+        imaxLabel = ttk.Label(self,text=EepromDataComplete[117])
         imaxLabel.grid(column=4,row=3)
 
         ttk.Label(self,text="variable Ladeparameter").grid(column=3, row=5,padx=5)
-        parActLabel = ttk.Label(self,text=EepromDataCharge[10])
+        parActLabel = ttk.Label(self,text=EepromDataComplete[119])
         parActLabel.grid(column=4,row=5)
 
         self.varChargeActText = StringVar()
@@ -144,24 +144,19 @@ class EepromChargeParam(ttk.Frame):
     def updateChargeLabels(self):
         i = 0
         for p in self.tchargeLabels:                	
-            self.tchargeLabels[i].configure(text=EepromDataCharge[i])
+            self.tchargeLabels[i].configure(text=EepromDataComplete[108 + i])
             i += 1
     
     #unbedingt auf Reihenfolge und Position in EepromData.py achten!
     #bei Veränderung der Listen müssen die Indizes überprüft werden
     def changeChargeLabels(self):
 
-        self.chargeParamSelect =  self.combo.current()
-        EepromDataCharge[self.chargeParamSelect] = self.valCombo.get()
+        self.chargeParamSelect =  self.combo.current()+108
+        EepromDataComplete[self.chargeParamSelect] = self.valCombo.get()
         
-        #self.chargeParamselect + 10 -> ab Pos 10 fängt EepromDataCharge an
-        EepromDataComplete[self.chargeParamSelect+10] = EepromDataCharge[self.chargeParamSelect]
-        #aktualisierung Aller Parameter in GUI
-        #print(EepromDataCharge[self.chargeParamSelect],end="\n")
-        #print(EepromDataComplete[self.chargeParamSelect+10])
         self.updateChargeLabels()
         #Eeprom-Daten auf Arduino überschreiben
-        self.changeEepromData(self.chargeParamSelect+10,EepromDataCharge[self.chargeParamSelect])
+        self.changeEepromData(self.chargeParamSelect,EepromDataComplete[self.chargeParamSelect])
 
     #Änderung von Parametern auf Arduino
     def changeEepromData(self,adress,content):
@@ -172,15 +167,13 @@ class EepromChargeParam(ttk.Frame):
         
         if EepromDataCharge[10] == 0xF0:
             self.varChargeActText.set("Variable Parameter: ein")
-            EepromDataCharge[10] = 0x0F
-            #EepromDataComplete[20] = EepromDataCharge[10]
-            self.changeEepromData(20,EepromDataCharge[10])
+            EepromDataComplete[119] = 0x0F
+            self.changeEepromData(119,EepromDataComplete[119])
             self.updateChargeLabels()
         else:
             self.varChargeActText.set("Variable Parameter: aus")
-            EepromDataCharge[10] = 0xF0
-            #EepromDataComplete[20] = EepromDataCharge[10]
-            self.changeEepromData(20,EepromDataCharge[10])
+            EepromDataComplete[119] = 0xF0
+            self.changeEepromData(119,EepromDataCharge[119])
             self.updateChargeLabels()
 
 #kann weg

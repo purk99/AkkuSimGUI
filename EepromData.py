@@ -27,17 +27,25 @@ uartCMD = {
 }
 
 ###Startwerte für alle Listen###
+###Values, that are neccessary or appear more than once
 EepromDataDict = {
     "safetyB1"      : 0x93,
     "safetyB2"      : 0xDA,
     "cellsInSer"    : 5,
-    "capBat"        : 0x0F,
-    "numCCstart1"   : 1,
+    "U_min"         : 0x19,
+    "capBat"        : 0xA,
+    "U_charge"      : 0xC7,
+    "max_temp"      : 0,
+    "min_temp"      : 0xFF,
+    "CellsInPar"    : 1,
+    "numCCstart1"   : 0,
     "numCCstart2"   : 1,
-    "numCVstart1"   : 1,
+    "numCVstart1"   : 0,
     "numCVstart2"   : 1,
-    "numCVstop1"    : 1,
+    "numCVstop1"    : 0,
     "numCVstop2"    : 1,
+    "numStartChaSub30Deg1"   : 0,
+    "numStartChaSub30Deg2"   : 1,
     "T_min"         : 0x20,
     "T_cold"        : 0x22,
     "T_warm"        : 0x30,
@@ -58,27 +66,7 @@ InfoDataDict = {
 #bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
 #in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
 #Indizierung prüfen
-EepromDataComplete = [  EepromDataDict["safetyB1"],
-                        EepromDataDict["safetyB2"],
-                        EepromDataDict["cellsInSer"],
-                        EepromDataDict["capBat"],
-                        EepromDataDict["numCCstart1"],
-                        EepromDataDict["numCCstart2"],
-                        EepromDataDict["numCVstart1"],
-                        EepromDataDict["numCVstart2"],
-                        EepromDataDict["numCVstop1"],
-                        EepromDataDict["numCVstop2"],
-                        EepromDataDict["T_min"],
-                        EepromDataDict["T_cold"],
-                        EepromDataDict["T_warm"],
-                        EepromDataDict["U_cold"],
-                        EepromDataDict["U_warm"],
-                        EepromDataDict["U_max"],
-                        EepromDataDict["I_cold"],
-                        EepromDataDict["I_warm"],
-                        EepromDataDict["I_max"],
-                        EepromDataDict["varCharge"]
-                    ]
+EepromDataComplete = bytearray[256]
 
 InfoData = [InfoDataDict["NTCvalue"],
             InfoDataDict["Overvoltage"]

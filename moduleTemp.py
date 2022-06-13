@@ -2,15 +2,17 @@
 from tkinter import *
 from tkinter import ttk
 
-#from tools_V21 import *
+from tools_V21 import *
 from EepromData import *
 
 class ModulTempHysterese(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
 
-        #meas = SensorRead(self)
-        #meas.grid(column=10,row=10)
+        self.meas = SensorRead(self)
+        self.meas.grid(column=10,row=10)
+
+        self.eeprom = EepromControl()
 
         headLabel = ttk.Label(self,text="Temperaturgesteuerte Stromhysterese",font='10')
         headLabel.grid(column=1,row=0)
@@ -27,8 +29,7 @@ class ModulTempHysterese(ttk.Frame):
         self.stepTime = ttk.Combobox(self,values=list(range(11)))
         self.stepTime.grid(column=1,row=4)
 
-        
-
+    
         tempB = ttk.Button(self,text="Test Starten",command = self.tempHys)
         tempB.grid(column=1, row=6)
 
@@ -53,29 +54,43 @@ class ModulTempHysterese(ttk.Frame):
         stepTimeinSecs = int(self.stepTime.get())*1000
         if int(self.egL.get()) > int(self.sgL.get()):
             if self.tempAktuell != int(self.egL.get()):
+                #refresh Temp in GUI
                 self.tAL.configure(text=self.tempAktuell)
+                #set InfoData[0](NTC Value) to actual value
+                self.setNTCinEeprom(self.tempAktuell)
                 self.tempAktuell += 1
                 self.tAL.after(stepTimeinSecs,self.tempHys)
+
             elif self.tempAktuell == int(self.egL.get()):
                 self.tAL.configure(text=self.tempAktuell)
+                #set Temperature to start Value
                 self.tempAktuell = int(self.sgL.get())
+                #set actual Temp value in Infodata[0] and Arduino
+                self.setNTCinEeprom(self.tempAktuell)
         
         else:
             if self.tempAktuell != int(self.egL.get()):
                 self.tAL.configure(text=self.tempAktuell)
+                #set InfoData[0](NTC Value) to actual value
+                self.setNTCinEeprom(self.tempAktuell)
+                #send Value from InfoData to Arduino Eeprom
                 self.tempAktuell -= 1
                 self.tAL.after(stepTimeinSecs,self.tempHys)
+
             elif self.tempAktuell == int(self.egL.get()):
                 self.tAL.configure(text=self.tempAktuell)
+                #set Temperature to start Value
                 self.tempAktuell = int(self.sgL.get())
+                #set actual Temp value in Infodata[0]
+                self.setNTCinEeprom(self.tempAktuell)
 
     def setManualTemp(self):
         self.tempAktuell = int(self.mTempL.get())
         self.tAL.configure(text=self.tempAktuell)
 
-    def setNTCinEeprom(self,temp):
-        
+    def setNTCinEeprom(self,temp): 
         InfoData[0] = temp
+        self.eeprom.writeNTC()
 
 class ModulTempNTCError(ttk.Frame):
     def __init__(self,parent):

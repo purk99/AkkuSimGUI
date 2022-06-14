@@ -1,6 +1,7 @@
 from math import ceil
 import string
-from numpy import char, float16, int16, uint16, uint8
+from numpy import char, float16, int16, size, uint16, uint8
+import numpy
 import pigpio
 
 from tkinter import ttk
@@ -28,19 +29,18 @@ for i in fields:
         counter += 1
         counter1 = 0
 '''
+file = open("NTCValues.csv")
+arr = numpy.loadtxt(file,delimiter=';')
+#print(arr[0,0])
+werteArray = [None] * 116
+tempArray = [None] * 116
+for p in range(size(arr,0)):
+    werteArray[p] = arr[p][1]
+    tempArray[p] = arr[p][0]
 
-def zeig():
-    val = int(z.get())
-    print(val)
-    print(type(val))
+print(werteArray)
 
-t = list(range(10))
-z = ttk.Combobox(frame, values=t)
-z.grid(column=1,row=1)
-
-ttk.Button(frame, text="zeig", command=zeig).grid(column=2,row=1)
-
-root.mainloop()
+#root.mainloop()
 
 
 

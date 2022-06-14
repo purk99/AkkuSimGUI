@@ -11,7 +11,7 @@
 #Indizierung prüfen
 ###                         !!ACHTUNG!!
 
-from numpy import arange
+from numpy import *
 
 ###Commands für Arduino
 uartCMD = {
@@ -66,7 +66,7 @@ InfoDataDict = {
 #bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
 #in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
 #Indizierung prüfen
-EepromDataComplete = bytearray[256]
+EepromDataComplete = [None] * 256
 
 InfoData = [InfoDataDict["NTCvalue"],
             InfoDataDict["Overvoltage"]
@@ -105,4 +105,13 @@ EepromDataCycle = [ EepromDataDict["numCCstart1"],
 EepromDataValues = list(range(255))
 CalibrationFine = list(arange(0,1,0.1))
 CalibrationCoarse = list(range(0,6))
-TempDataValues = list(range(-10,100))
+
+#Setup of Temprature Data of NTC
+file = open("NTCValues.csv")
+arr = loadtxt(file,delimiter=';')
+#print(arr[0,0])
+NTCTempValues = [None] * 116
+NTCTemps = [None] * 116
+for p in range(size(arr,0)):
+    NTCTempValues[p] = int(arr[p][1])
+    NTCTemps[p] = int(arr[p][0])

@@ -12,10 +12,10 @@ class ModulTempHysterese(ttk.Frame):
 
         #show actual charge parameters 
         self.chargePar = EepromChargeParam(self)
-        self.chargePar.grid(column=5,row=1)
+        self.chargePar.grid(column=5,row=5)
 
         self.meas = SensorRead(self)
-        self.meas.grid(column=10,row=10)
+        self.meas.grid(column=5,row=1)
 
         self.eeprom = EepromControl()
 
@@ -23,11 +23,11 @@ class ModulTempHysterese(ttk.Frame):
         headLabel.grid(column=1,row=0)
 
         ttk.Label(self,text="Starttemperatur").grid(column=0,row=1)
-        self.sgL = ttk.Combobox(self,values=TempDataValues)
+        self.sgL = ttk.Combobox(self,values=NTCTemps)
         self.sgL.grid(column=1,row=1)
 
         ttk.Label(self,text="Endtemperatur").grid(column=0,row=3)
-        self.egL = ttk.Combobox(self,values=TempDataValues)
+        self.egL = ttk.Combobox(self,values=NTCTemps)
         self.egL.grid(column=1,row=3)
 
         ttk.Label(self,text="Schrittzeit").grid(column=0,row=4)
@@ -41,7 +41,7 @@ class ModulTempHysterese(ttk.Frame):
         ttk.Label(self,text="Manuelle Temperatureinstellung",font='10').grid(column=1,row=7)
 
         ttk.Label(self,text="Neue Temperatur").grid(column=0,row=8)
-        self.mTempL = ttk.Combobox(self,values=TempDataValues)
+        self.mTempL = ttk.Combobox(self,values=NTCTemps)
         self.mTempL.grid(column=1,row=8)
 
         self.newTempB = ttk.Button(self,text="Temperatur einstellen",command=self.setManualTemp)
@@ -62,7 +62,7 @@ class ModulTempHysterese(ttk.Frame):
                 #refresh Temp in GUI
                 self.tAL.configure(text=self.tempAktuell)
                 #set InfoData[0](NTC Value) to actual value
-                self.setNTCinEeprom(self.tempAktuell)
+                self.setNTCinEeprom(NTCTempValues[self.tempAktuell+35])
                 self.tempAktuell += 1
                 self.tAL.after(stepTimeinSecs,self.tempHys)
 
@@ -71,13 +71,13 @@ class ModulTempHysterese(ttk.Frame):
                 #set Temperature to start Value
                 self.tempAktuell = int(self.sgL.get())
                 #set actual Temp value in Infodata[0] and Arduino
-                self.setNTCinEeprom(self.tempAktuell)
+                self.setNTCinEeprom(NTCTempValues[self.tempAktuell+35])
         
         else:
             if self.tempAktuell != int(self.egL.get()):
                 self.tAL.configure(text=self.tempAktuell)
                 #set InfoData[0](NTC Value) to actual value
-                self.setNTCinEeprom(self.tempAktuell)
+                self.setNTCinEeprom(NTCTempValues[self.tempAktuell+35])
                 #send Value from InfoData to Arduino Eeprom
                 self.tempAktuell -= 1
                 self.tAL.after(stepTimeinSecs,self.tempHys)
@@ -87,11 +87,12 @@ class ModulTempHysterese(ttk.Frame):
                 #set Temperature to start Value
                 self.tempAktuell = int(self.sgL.get())
                 #set actual Temp value in Infodata[0]
-                self.setNTCinEeprom(self.tempAktuell)
+                self.setNTCinEeprom(NTCTempValues[self.tempAktuell+35])
 
     def setManualTemp(self):
         self.tempAktuell = int(self.mTempL.get())
         self.tAL.configure(text=self.tempAktuell)
+        self.setNTCinEeprom(NTCTempValues[self.tempAktuell+35])
 
     def setNTCinEeprom(self,temp): 
         InfoData[0] = temp

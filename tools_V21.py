@@ -231,7 +231,8 @@ class EepromControl():
 
     #unbenutzte Funktion        
     def readAllRegisters(self):
-        self.sendPackage(uartCMD["eepromReadAll"],0,1)
+        for i in range(256):
+            EepromDataComplete[i] = self.readSingleRegister(i)
 
     def writeSingleRegister(self,adress,content):
         self.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)

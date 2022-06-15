@@ -1,4 +1,5 @@
 
+from re import T
 from tkinter import *
 from tkinter import ttk
 
@@ -52,8 +53,18 @@ class ModulTempHysterese(ttk.Frame):
         self.tAL = ttk.Label(self,text=self.tempAktuell,font='15')
         self.tAL.grid(column=1,row=10)
 
+        self.testStatus = ttk.Label(self,text="Teststatus",font='15').grid(column=2,row=10)
+        self.tSL = ttk.Label(self,text="Okay",font='15')
+        self.tSL.grid(column=2,row=10)
+
         eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
         eb.grid(column=10,row=10)
+
+    def checkTestStatus(self):
+        if self.meas.getCurrBat() == 0:
+            self.tSL.configure(text="Ladegerät Error")
+        self.tSL.after(2000,self.checkTestStatus)
+
 
     def tempHys(self):
         stepTimeinSecs = int(self.stepTime.get())*1000

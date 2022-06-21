@@ -107,7 +107,7 @@ CalibrationFine = list(arange(0,1,0.1))
 CalibrationCoarse = list(range(0,6))
 
 #Setup of Temprature Data of NTC
-file = open("NTCValues.csv")
+file = open("/home/festool/Documents/AkkuSimGUI/NTCValues.CSV") 
 arr = loadtxt(file,delimiter=';')
 #print(arr[0,0])
 NTCTempValues = [None] * 116

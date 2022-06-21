@@ -5,6 +5,8 @@ from time import sleep
 from numpy import byte, float16, int16, uint16, uint8
 import serial
 from smbus2 import SMBus
+import csv
+import numpy
 
 from EepromData import *
 from pigpio import *
@@ -53,37 +55,33 @@ class SensorRead(ttk.Frame):
         sensFrame = self
         sensFrame.grid()
 
-        vbl = ttk.Label(sensFrame, text="Spannung Batterie")
-        vbl.grid(column=2,row=1)
+        vbl = ttk.Label(sensFrame, text="Spannung Batterie", font=20)
+        vbl.grid(column=2,row=1, sticky=W)
 
-        self.voltageBatl = ttk.Label(sensFrame, text = self.voltBat)
+        self.voltageBatl = ttk.Label(sensFrame, text = self.voltBat, font=20)
         self.voltageBatl.grid(column=3, row=1)
 
-        self.vcl = ttk.Label(sensFrame,text="Spannung Zelle")
-        self.vcl.grid(column=2,row=2)
+        self.vcl = ttk.Label(sensFrame,text="Spannung Zelle", font=20)
+        self.vcl.grid(column=2,row=2, sticky=W)
 
-        self.voltageCelll = ttk.Label(sensFrame, text = self.voltCell)
+        self.voltageCelll = ttk.Label(sensFrame, text = self.voltCell, font=20)
         self.voltageCelll.grid(column=3,row=2)
 
-        ibl = ttk.Label(sensFrame,text="Batterie Gesamtstrom")
-        ibl.grid(column=2,row=3)
+        ibl = ttk.Label(sensFrame,text="Batterie Gesamtstrom", font=20)
+        ibl.grid(column=2,row=3, sticky=W)
 
-        self.currentBatl = ttk.Label(sensFrame, text = self.currBat)
+        self.currentBatl = ttk.Label(sensFrame, text = self.currBat, font=20)
         self.currentBatl.grid(column=3,row=3)
 
         startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.checkMeas)
-        startMeasB.grid(column=3,row=4)
+        startMeasB.grid(column=3,row=4, pady=2)
 
         calB = ttk.Button(sensFrame,text="Kalibrierung",command=self.calib)
         calB.grid(column=3,row=5)
         
     def calib(self):
         #Config-register beschreiben
-        #0100 0101 1010 1111 = 0x45AF
-        self.ina226_writeReg(self.ina226_config_reg,0x45AF)
-
-        #Kalibrierungsregister beschreiben
-        self.ina226_calibrateReg(5,0.01)
+        self.ina226_calibrateReg(6,0.01)
 
     def checkMeas(self):
         self.test()
@@ -93,7 +91,7 @@ class SensorRead(ttk.Frame):
     def test(self):
         cellVoltage = self.ina226_getBusVoltage()/int(EepromDataComplete[2])
         self.currentBatl.configure(text = self.ina226_getCurr())
-        self.voltageCelll.configure(text = cellVoltage)
+        self.voltageCelll.configure(text = round(cellVoltage,4))
         self.voltageBatl.configure(text = self.ina226_getBusVoltage())
 
     #Auslesen von Register 
@@ -117,6 +115,17 @@ class SensorRead(ttk.Frame):
         self.cal = uint16(0.00512/(self.currentLSB*rShunt))
         self.ina226_writeReg(self.ina226_cal_reg,self.cal)
 
+    def readCalibrationValuesFromCSV(self):
+        file = open('calibVals.CSV')
+        arr = numpy.loadtxt(file, delimiter=',')
+        
+        self.shuntVoltOffset    = arr[0]
+        self.busVoltOffset      = arr[1]
+        self.busCurrOffset      = arr[2]
+        self.powerOffset        = arr[3]
+       
+
+    #kann zu testzwecken ausgelesen werden
     def ina226_getShuntVoltage(self):
         shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6) + (self.shuntVoltOffset*2.5e-6))
         return round(shuntVolt,4)
@@ -129,30 +138,42 @@ class SensorRead(ttk.Frame):
         busCurr = float(self.ina226_readReg(self.ina226_curr_reg)*self.currentLSB + self.busCurrOffset)
         return round(busCurr,2)
 
-    def getPower(self):
+    def ina226_getPower(self):
         busPow = float(self.ina226_readReg(self.ina226_power_reg)*25*self.currentLSB + self.powerOffset)
         return busPow
 
-    def getVoltageBat(self):
+    def ina226_getVoltageBat(self):
         return self.voltBat
 
-    def getVoltageCell(self):
+    def ina226_getVoltageCell(self): 
         return self.voltCell
 
-    def getCurrBat(self):
+    def ina226_getCurrBat(self):
         return self.currBat
     
-    def setShuntOffset(self,offset):
+    def ina226_setShuntOffset(self,offset):
         self.shuntVoltOffset = offset
     
-    def setBusVoltOffset(self,offset):
+    def ina226_setBusVoltOffset(self,offset):
         self.busVoltOffset = offset
     
-    def setBusCurrOffset(self,offset):
+    def ina226_setBusCurrOffset(self,offset):
         self.busCurrOffset = offset
 
-    def setBusPowerOffset(self,offset):
+    def ina226_setBusPowerOffset(self,offset):
         self.powerOffset = offset
+    
+    def ina226_getShuntOffset(self):
+        return self.shuntVoltOffset
+
+    def ina226_getBusOffset(self):
+        return self.busVoltOffset
+
+    def ina226_getBusCurrOffset(self):
+        return self.busCurrOffset
+
+    def ina226_getPowerOffset(self):
+        return self.powerOffset
 
 
 class Countdown(ttk.Frame):
@@ -206,6 +227,7 @@ class Countdown(ttk.Frame):
 class EepromControl():
     def __init__(self):
         #super().__init__()
+        self.setEeprom()
         self.sendBuffer = bytearray(5)
         self.receiveBuffer = bytearray(3)
         self.ser = serial.Serial("/dev/ttyAMA0", 9600)
@@ -238,11 +260,11 @@ class EepromControl():
         self.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)
 
     def readNTC(self):
-        self.sendPackage(uartCMD["readNTC"],1,1)
+        self.sendPackage(uartCMD["ntcRead"],1,1)
         return self.receivePackage()
         
     def writeNTC(self):
-        self.sendPackage(uartCMD["writeNTC"],1,InfoData[0])
+        self.sendPackage(uartCMD["ntcWrite"],1,InfoData[0])
 
     def readOverVoltage(self):
         self.sendPackage(uartCMD["voltageProtectRead"],1,1)
@@ -257,9 +279,9 @@ class EepromControl():
         EepromDataComplete[1] = EepromDataDict["safetyB2"]
         EepromDataComplete[2] = EepromDataDict["cellsInSer"]    #number of cells in Series
         EepromDataComplete[3] = EepromDataDict["U_min"]         #U_min
-        EepromDataComplete[4] = 0x18         #T_max
-        EepromDataComplete[5] = 0x80                             #not specified
-        EepromDataComplete[6] = 0xD4                             #calibration value
+        EepromDataComplete[4] = 0x18                            #T_max
+        EepromDataComplete[5] = 0x80                            #not specified
+        EepromDataComplete[6] = 0xD4                            #calibration value
         EepromDataComplete[7] = 0xC0                             #calibration value
         EepromDataComplete[8] = EepromDataDict["capBat"]                              #C_batt
         EepromDataComplete[9] = EepromDataDict["U_charge"]                             #U_charge
@@ -292,7 +314,7 @@ class EepromControl():
 
         #Akkupack Infos 2/3
         EepromDataComplete[33] = EepromDataDict["safetyB1"]
-        EepromDataComplete[34] = EepromDataDict["safteyB2"]
+        EepromDataComplete[34] = EepromDataDict["safetyB2"]
         EepromDataComplete[35] = EepromDataDict["numStartChaSub30Deg1"]         #Number of start charging              H Byte
         EepromDataComplete[36] = EepromDataDict["numStartChaSub30Deg2"]         #operations with temperature <30°C     L Byte
         EepromDataComplete[37] = EepromDataDict["U_charge"]                          #U_charge

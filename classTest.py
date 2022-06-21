@@ -16,9 +16,10 @@ class root(tk.Tk):
 
         self.title("Klasse")
         self.grid()
+        self.attributes('-fullscreen',True)
 
         mainframe = ttk.Frame(self, padding= 10, relief="ridge", borderwidth=5)
-        mainframe.grid()
+        mainframe.grid(sticky=NSEW)
         mainframe.columnconfigure(0, weight=1)
         mainframe.rowconfigure(0, weight=1)
 
@@ -47,7 +48,7 @@ class root(tk.Tk):
         label.grid(column=1,row=0)
 
         eb = ttk.Button(mainframe,text="Programm Beenden",command = self.destroy) 
-        eb.grid(column=10,row=10)
+        eb.grid(column=1,row=10)
 
     def openWindowSpannung(self):
         ModulSpannung() 

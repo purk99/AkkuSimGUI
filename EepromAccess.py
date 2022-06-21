@@ -42,72 +42,76 @@ class EepromInfo(Toplevel):
 class EepromChargeParam(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
+        
+        #eeprom = EepromControl()
+        self.arduninoEeprom = EepromControl()
 
         self.grid()
-        self.configure(relief="ridge",padding=10)
-
-        ttk.Label(self,text="Ladeparameter").grid(column=1,row=0,padx=5)
-    
-        ttk.Label(self,text="T_min").grid(column=0,row=1,padx=5)
-        tminLabel = ttk.Label(self,text=EepromDataComplete[108])
-        tminLabel.grid(column=2,row=1)
-
-        ttk.Label(self,text="T_cold").grid(column=0,row=2,padx=5)
-        tcoldLabel = ttk.Label(self,text=EepromDataComplete[109])
-        tcoldLabel.grid(column=2,row=2)
-
-        ttk.Label(self,text="T_warm").grid(column=0,row=3,padx=5)
-        twarmLabel = ttk.Label(self,text=EepromDataComplete[110])
-        twarmLabel.grid(column=2,row=3)
-
-        ttk.Label(self,text="T_max").grid(column=0,row=4,padx=5)
-        tmaxLabel = ttk.Label(self,text=EepromDataComplete[111])
-        tmaxLabel.grid(column=2,row=4)
-
-        ttk.Label(self,text="U_cold").grid(column=0,row=5,padx=5)
-        ucoldLabel = ttk.Label(self,text=EepromDataComplete[112])
-        ucoldLabel.grid(column=2,row=5)
-
-        ttk.Label(self,text="U_warm").grid(column=0,row=6,padx=5)
-        uwarmLabel = ttk.Label(self,text=EepromDataComplete[113])
-        uwarmLabel.grid(column=2,row=6)
-
-        ttk.Label(self,text="U_max").grid(column=0,row=7,padx=5)
-        umaxLabel = ttk.Label(self,text=EepromDataComplete[114])
-        umaxLabel.grid(column=2,row=7)
+        self.configure(relief="ridge")
         
-        ttk.Label(self,text="I_cold").grid(column=3,row=1,padx=5)
-        icoldLabel = ttk.Label(self,text=EepromDataComplete[115])
+        self.valF = ttk.Frame(self, relief='ridge')
+        self.valF.grid(column=0,row=1)
+        
+        self.parChangeF = ttk.Frame(self, relief='ridge')
+        self.parChangeF.grid(column=1,row=1)
+
+        ttk.Label(self,text="Ladeparameter",font='15').grid(column=1,row=0,sticky=EW)
+    
+        ttk.Label(self.valF,text="T_min").grid(column=0,row=1,padx=1,sticky=W)
+        tminLabel = ttk.Label(self.valF,text=EepromDataComplete[108])
+        tminLabel.grid(column=1,row=1)
+
+        ttk.Label(self.valF,text="T_cold").grid(column=0,row=2,padx=1, sticky=W)
+        tcoldLabel = ttk.Label(self.valF,text=EepromDataComplete[109])
+        tcoldLabel.grid(column=1,row=2)
+
+        ttk.Label(self.valF,text="T_warm").grid(column=0,row=3,padx=1, sticky=W)
+        twarmLabel = ttk.Label(self.valF,text=EepromDataComplete[110])
+        twarmLabel.grid(column=1,row=3)
+
+        ttk.Label(self.valF,text="T_max").grid(column=0,row=4,padx=1, sticky=W)
+        tmaxLabel = ttk.Label(self.valF,text=EepromDataComplete[111])
+        tmaxLabel.grid(column=1,row=4)
+
+        ttk.Label(self.valF,text="U_cold").grid(column=0,row=5,padx=1, sticky=W)
+        ucoldLabel = ttk.Label(self.valF,text=EepromDataComplete[112])
+        ucoldLabel.grid(column=1,row=5)
+
+        ttk.Label(self.valF,text="U_warm").grid(column=0,row=6,padx=1, sticky=W)
+        uwarmLabel = ttk.Label(self.valF,text=EepromDataComplete[113])
+        uwarmLabel.grid(column=1,row=6)
+
+        ttk.Label(self.valF,text="U_max").grid(column=0,row=7,padx=1, sticky=W)
+        umaxLabel = ttk.Label(self.valF,text=EepromDataComplete[114])
+        umaxLabel.grid(column=1,row=7)
+        
+        ttk.Label(self.valF,text="I_cold").grid(column=3,row=1,padx=1, sticky=W)
+        icoldLabel = ttk.Label(self.valF,text=EepromDataComplete[115])
         icoldLabel.grid(column=4,row=1)
 
-        ttk.Label(self,text="I_warm").grid(column=3,row=2,padx=5)
-        iwarmLabel = ttk.Label(self,text=EepromDataComplete[116])
+        ttk.Label(self.valF,text="I_warm").grid(column=3,row=2,padx=1, sticky=W)
+        iwarmLabel = ttk.Label(self.valF,text=EepromDataComplete[116])
         iwarmLabel.grid(column=4,row=2)
 
-        ttk.Label(self,text="I_max").grid(column=3,row=3,padx=5)
-        imaxLabel = ttk.Label(self,text=EepromDataComplete[117])
+        ttk.Label(self.valF,text="I_max").grid(column=3,row=3,padx=1, sticky=W)
+        imaxLabel = ttk.Label(self.valF,text=EepromDataComplete[117])
         imaxLabel.grid(column=4,row=3)
 
-        ttk.Label(self,text="variable Ladeparameter").grid(column=3, row=5,padx=5)
-        parActLabel = ttk.Label(self,text=EepromDataComplete[119])
+        ttk.Label(self.valF,text="variable").grid(column=3, row=4,padx=1, sticky=W)
+        parActLabel = ttk.Label(self.valF,text=EepromDataComplete[119])
         parActLabel.grid(column=4,row=5)
 
         self.varChargeActText = StringVar()
         self.varChargeActText.set("Variable Parameter: ein")
-        self.changeParActB = ttk.Button(self,textvariable=self.varChargeActText,command=self.changeVarCharge)
-        self.changeParActB.grid(column=3,row=6)
-
-        #self.updateChargeLabels()
-
-        uB = ttk.Button(self,text="Daten aktualisieren", command=self.updateChargeLabels)
-        uB.grid(column=0,row=10)
+        self.changeParActB = ttk.Button(self.parChangeF,textvariable=self.varChargeActText,command=self.changeVarCharge)
+        self.changeParActB.grid(column=0,row=0)
 
         ###Änderungen an Charge-Parametern###
-        paramChangeL = ttk.Label(self,text="Parameter: ")
-        paramChangeL.grid(column=1,row=10)
+        paramChangeL = ttk.Label(self.parChangeF,text="Parameter: ")
+        paramChangeL.grid(column=0,row=1)
 
         #Combobox
-        self.combo = ttk.Combobox(self,values=[  "T_min",
+        self.combo = ttk.Combobox(self.parChangeF,values=[  "T_min",
                                             "T_cold",
                                             "T_max",
                                             "U_cold",
@@ -117,16 +121,16 @@ class EepromChargeParam(ttk.Frame):
                                             "I_warm",
                                             "I_max"
                                         ])
-        self.combo.grid(column=2,row=10)
+        self.combo.grid(column=1,row=1)
 
-        updateB = ttk.Button(self,text="Parameter ändern",command=self.changeChargeLabels)
-        updateB.grid(column=3,row=10)
+        updateB = ttk.Button(self.parChangeF,text="Parameter ändern",command=self.changeChargeLabels)
+        updateB.grid(column=0,row=3)
 
-        valL = ttk.Label(self,text="Wert: ")
-        valL.grid(column=1,row=11)
+        valL = ttk.Label(self.parChangeF,text="Wert: ")
+        valL.grid(column=0,row=2)
 
-        self.valCombo = ttk.Combobox(self,values=EepromDataValues)
-        self.valCombo.grid(column=2,row=11)
+        self.valCombo = ttk.Combobox(self.parChangeF,values=EepromDataValues)
+        self.valCombo.grid(column=1,row=2)
         
         
         self.tchargeLabels = [  tminLabel,
@@ -160,8 +164,7 @@ class EepromChargeParam(ttk.Frame):
 
     #Änderung von Parametern auf Arduino
     def changeEepromData(self,adress,content):
-        arduninoEeprom = EepromControl()
-        arduninoEeprom.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)
+        self.arduninoEeprom.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)
 
     def changeVarCharge(self):
         

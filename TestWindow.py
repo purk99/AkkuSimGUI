@@ -1,3 +1,4 @@
+from csv import *
 from itertools import count
 from math import ceil
 import re
@@ -9,11 +10,35 @@ import pigpio
 from tkinter import ttk
 from tkinter import *
 
-fields = list(range(129))
+file = open('calibVals.CSV')
+arr = numpy.loadtxt(file,delimiter=',')
+print(arr)
+
+calibrationValues = [None] * 4
+for p in range(size(arr)):
+    calibrationValues[p] = arr[p]
+
+print(calibrationValues)
+
+def turnIntoTuple():
+    return tuple(calibrationValues)
+
+print(type(turnIntoTuple()))
+x = turnIntoTuple()
+print(x[1])
+
+'''
+fields = list(range(10))
+
+f = open('calibVals.CSV','w')
+writer = writer(f)
+writer.writerow(fields)
+print("schreiben abgeschlossen")
+f.close()
 
 #neuer Kommentar
 
-'''
+
 root = Tk()
 
 labelframe = LabelFrame(root, text="This is a LabelFrame")
@@ -24,7 +49,6 @@ left.pack()
  
 root.mainloop()
 
-'''
 root = Tk()
 root.geometry("800x480")
 
@@ -34,7 +58,6 @@ frame.grid()
 counter = 0
 counter1 = 0
 lfF = [None] * 65
-'''
 lfF[0] = ttk.Labelframe(frame,text="test",padding=1)
 lfF[0].grid(column=1,row=1)
 ttk.Label(lfF[0], text=hex(100)).grid(column=0,row=0,pady=2,sticky=E)
@@ -45,7 +68,6 @@ for p in range(65):
     #lfF[p].grid(column=counter,row=counter1)
     
         
-'''
 for i in fields:
     ttk.Label(frame, text=hex(fields[i])).grid(column=counter*3,row=counter1,pady=2,sticky=E)
     ttk.Label(frame,text=hex(100-fields[i])).grid(column=(counter*3)+1,row=counter1,pady=2,sticky=W)
@@ -56,7 +78,6 @@ for i in fields:
 
 
 
-'''
 for p in range(20):
     if p%2 == 0:
         ttk.Separator(frame,orient='vertical').grid(column=p,row=0,ipady=200)
@@ -74,8 +95,8 @@ for p in range(size(arr,0)):
     tempArray[p] = arr[p][0]
 
 print(werteArray)
-'''
 root.mainloop()
+'''
 
 
 

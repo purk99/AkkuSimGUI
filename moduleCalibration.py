@@ -1,9 +1,10 @@
-from ast import match_case
-from difflib import Match
 from tkinter import ttk
 from tkinter import *
+
 from EepromData import *
 from tools_V21 import SensorRead
+import csv
+import numpy
 
 class ModulKalibirerungAllgemein(ttk.Frame):
     def __init__(self,parent):
@@ -13,28 +14,30 @@ class ModulKalibirerungAllgemein(ttk.Frame):
 
         self.meas = SensorRead(self)
         self.meas.grid(column=0,row=1)
+        
+        self.calibVals = [0,0,0,0]
 
         infoL = ttk.Label(self,text="Mit genauem Netzteil kalibrieren!")
         infoL.grid(column=1,row=1)
 
         ttk.Label(self,text="Shuntspannung Offset:").grid(column=0,row=2)
-        #shuntCalL = ttk.Label(self,text=self.meas.ina226_getShuntVoltage())
-        shuntCalL = ttk.Label(self,text=10)
+        shuntCalL = ttk.Label(self,text=self.meas.ina226_getShuntOffset())
+        #shuntCalL = ttk.Label(self,text=10)
         shuntCalL.grid(column=1,row=2)
 
         ttk.Label(self,text="Busspannung Offset:").grid(column=0,row=3)
-        #busCalL = ttk.Label(self,text=self.meas.ina226_getBusVoltage())
-        busCalL = ttk.Label(self,text=10)
+        busCalL = ttk.Label(self,text=self.meas.ina226_getBusOffset())
+        #busCalL = ttk.Label(self,text=10)
         busCalL.grid(column=1,row=3)
 
         ttk.Label(self,text="Busstrom Offset:").grid(column=0,row=4)
-        #currCalL = ttk.Label(self,text=self.meas.ina226_getCurr())
-        currCalL = ttk.Label(self,text=10)
+        currCalL = ttk.Label(self,text=self.meas.ina226_getBusCurrOffset())
+        #currCalL = ttk.Label(self,text=10)
         currCalL.grid(column=1,row=4)
 
         ttk.Label(self,text="Leistung Offset:").grid(column=0,row=5)
-        #powCalL = ttk.Label(self,text=self.meas.getPower())
-        powCalL = ttk.Label(self,text=10)
+        powCalL = ttk.Label(self,text=self.meas.ina226_getPowerOffset())
+        #powCalL = ttk.Label(self,text=10)
         powCalL.grid(column=1,row=5)
 
         self.calSelectCombo = ttk.Combobox(self,values=[
@@ -56,30 +59,56 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         ttk.Button(self,text="Aufaddieren", command=self.calibrateMeas_Add).grid(column=0,row=8)
         ttk.Button(self,text="Abziehen", command=self.calibrateMeas_Subtract).grid(column=1,row=8)
 
+        self.readCalValuesFromCSV()
+        self.setMeasCalibration()
+
     def calibrateMeas_Add(self):
         switchVal = self.calSelectCombo.current()
         print(switchVal)
         if switchVal == 0:
-           self.meas.setShuntOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+            self.calibVals[0] = int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
         if switchVal == 1:
-            self.meas.setBusVoltOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+            self.calibVals[1] = int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
         if switchVal == 2:
-            self.meas.setBusCurrOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+            self.calibVals[2] = int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
         if switchVal == 3:
-            self.meas.setBusPowerOffset(int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+            self.calibVals[3] = int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+        self.setMeasCalibration()
+        self.saveCalValuesToCSV()
 
     def calibrateMeas_Subtract(self):
         switchVal = self.calSelectCombo.current()
         if switchVal == 0:
-            self.meas.setShuntOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+            self.calibVals[0] = -1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
         if switchVal == 1:
-            self.meas.setBusVoltOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+            self.calibVals[1] = -1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
         if switchVal == 2:
-            self.meas.setBusCurrOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+            self.calibVals[2] = -1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
         if switchVal == 3:
-            self.meas.setBusPowerOffset(-1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get()))
+            self.calibVals[3] = -1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+        self.setMeasCalibration()
+        self.saveCalValuesToCSV()
+
+    def saveCalValuesToCSV(self):
+
+        f = open('calibVals.CSV','w')
+        writer = csv.writer(f)
+        writer.writerow(self.calibVals)
         
+
+    def readCalValuesFromCSV(self):
+        file = open('calibVals.CSV')
+        arr = numpy.loadtxt(file, delimiter=',')
         
+        for p in range(size(arr)):
+            self.calibVals[p] = arr[p]
+
+    def setMeasCalibration(self):
+        self.meas.ina226_setShuntOffset(self.calibVals[0])
+        self.meas.ina226_setBusVoltOffset(self.calibVals[1])
+        self.meas.ina226_setBusCurrOffset(self.calibVals[2])
+        self.meas.ina226_setBusPowerOffset(self.calibVals[3])
+            
 
 
 

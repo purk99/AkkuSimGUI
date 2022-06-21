@@ -75,6 +75,7 @@ class ModulEeprom(Toplevel):
 class ModulTemperatur(Toplevel):
     def __init__(self,master=None):
         super().__init__(master = master)
+        self.attributes('-fullscreen', True)
 
         modulframe = ttk.Frame(self)
         modulframe.grid()
@@ -88,13 +89,16 @@ class ModulTemperatur(Toplevel):
         hystB = ttk.Button(self,text="Testmodul Temperaturhysterese",padding=10, command=self.showModulTempHysterese)
         hystB.grid(column=0, row=2)
 
+        eb = ttk.Button(modulframe,text="Programm Beenden",command = self.destroy) 
+        eb.grid(column=1,row=10, sticky=E)
+
     def showModulNTCError(self):
-        cF = ModulTempHysterese(self)
+        cF = ModulTempNTCError(self)
         cF.grid(column=0,row=10)
 
     def showModulTempHysterese(self):
-        cF = ModulTempNTCError(self)
-        cF.grid(column=10,row=0)
+        cF = ModulTempHysterese(self)
+        cF.grid(column=0,row=1)
 
 class ModulKapazität(Toplevel):
     def __init__(self,master = None):

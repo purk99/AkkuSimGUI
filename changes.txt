@@ -1,0 +1,21 @@
+Raspberry Thonny IDe
+V1.1.1
+-tools.v21: 241/245 changed names from read/writeNTC to ntRead/write
+			295 fixed name of safetyB2
+			209 added setEeprom to Constructor
+-EEpromdata.py
+			110 changed file path of ntcvalues.csv
+			
+-moduleTemp
+			21 added separate Frame for Tempvalue settings
+			40 changed command to setTempToStartVal
+			69 added new function to reset tempAktuell
+			91/107 commented out commands to send temps
+			added parameter sticky=W to comboboxes
+			
+-eepromAccess
+			47 removed padding from frame
+			53 added new Frame for changing parameters self.parChangeF
+			rearranged all widgets for better view
+V1.1.2
+		

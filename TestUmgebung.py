@@ -3,16 +3,26 @@ from tkinter import ttk
 
 from time import sleep
 from timer import *
+
+from tools_V21 import EepromControl
+
 from EepromData import *
-#from EepromAccess import EepromChargeParam
+from EepromAccess import EepromChargeParam
+from moduleTemp import ModulTempHysterese
 
 root = Tk()
 root.title("Testfenster")
 root.geometry("800x480")
 
-mainframe = ttk.Frame(root)
-mainframe.grid()
+eeprom = EepromControl()
 
+mainframe = ttk.Frame(root)
+mainframe.grid(sticky=NSEW)
+
+test = ModulTempHysterese(mainframe)
+test.grid()
+
+'''
 tL = ttk.Label(mainframe,text="Testumgebung",font='20')
 tL.grid(column=1,row=0)
 
@@ -49,6 +59,8 @@ tAL.grid(column=1,row=10)
 
 eb = ttk.Button(mainframe,text="Exit",command=root.destroy)
 eb.grid(column=10,row=10)
+'''
+
 
 root.mainloop()
 

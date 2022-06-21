@@ -78,6 +78,8 @@ class SensorRead(ttk.Frame):
 
         calB = ttk.Button(sensFrame,text="Kalibrierung",command=self.calib)
         calB.grid(column=3,row=5)
+
+        self.readCalibrationValuesFromCSV()
         
     def calib(self):
         #Config-register beschreiben
@@ -127,7 +129,7 @@ class SensorRead(ttk.Frame):
 
     #kann zu testzwecken ausgelesen werden
     def ina226_getShuntVoltage(self):
-        shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6) + (self.shuntVoltOffset*2.5e-6))
+        shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6) + (self.shuntVoltOffset))
         return round(shuntVolt,4)
 
     def ina226_getBusVoltage(self):

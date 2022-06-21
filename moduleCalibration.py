@@ -2,7 +2,7 @@ from tkinter import ttk
 from tkinter import *
 
 from EepromData import *
-from tools_V21 import SensorRead
+from tools_V21 import *
 import csv
 import numpy
 
@@ -11,6 +11,9 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         ttk.Frame.__init__(self,parent)
 
         self.grid()
+        
+        #needed for initialization of Eeprom Values
+        eeprom = EepromControl()
 
         self.meas = SensorRead(self)
         self.meas.grid(column=0,row=1)
@@ -21,24 +24,24 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         infoL.grid(column=1,row=1)
 
         ttk.Label(self,text="Shuntspannung Offset:").grid(column=0,row=2)
-        shuntCalL = ttk.Label(self,text=self.meas.ina226_getShuntOffset())
+        self.shuntCalL = ttk.Label(self,text=self.meas.ina226_getShuntOffset())
         #shuntCalL = ttk.Label(self,text=10)
-        shuntCalL.grid(column=1,row=2)
+        self.shuntCalL.grid(column=1,row=2)
 
         ttk.Label(self,text="Busspannung Offset:").grid(column=0,row=3)
-        busCalL = ttk.Label(self,text=self.meas.ina226_getBusOffset())
-        #busCalL = ttk.Label(self,text=10)
-        busCalL.grid(column=1,row=3)
+        self.busCalL = ttk.Label(self,text=self.meas.ina226_getBusOffset())
+        #self.busCalL = ttk.Label(self,text=10)
+        self.busCalL.grid(column=1,row=3)
 
         ttk.Label(self,text="Busstrom Offset:").grid(column=0,row=4)
-        currCalL = ttk.Label(self,text=self.meas.ina226_getBusCurrOffset())
+        self.currCalL = ttk.Label(self,text=self.meas.ina226_getBusCurrOffset())
         #currCalL = ttk.Label(self,text=10)
-        currCalL.grid(column=1,row=4)
+        self.currCalL.grid(column=1,row=4)
 
         ttk.Label(self,text="Leistung Offset:").grid(column=0,row=5)
-        powCalL = ttk.Label(self,text=self.meas.ina226_getPowerOffset())
+        self.powCalL = ttk.Label(self,text=self.meas.ina226_getPowerOffset())
         #powCalL = ttk.Label(self,text=10)
-        powCalL.grid(column=1,row=5)
+        self.powCalL.grid(column=1,row=5)
 
         self.calSelectCombo = ttk.Combobox(self,values=[
                                                         "Shunt-Offset[mV]",
@@ -51,10 +54,10 @@ class ModulKalibirerungAllgemein(ttk.Frame):
 
 
         self.calSelectCombo.grid(column=0,row=7)
-        self.calValFineCombo = ttk.Combobox(self,values=CalibrationCoarse)
-        self.calValFineCombo.grid(column=1,row=7)
-        self.calValCoarseCombo = ttk.Combobox(self,values=CalibrationFine)
-        self.calValCoarseCombo.grid(column=2,row=7)
+        self.calValCoarseCombo = ttk.Combobox(self,values=CalibrationCoarse)
+        self.calValCoarseCombo.grid(column=1,row=7)
+        self.calValFineCombo = ttk.Combobox(self,values=CalibrationFine)
+        self.calValFineCombo.grid(column=2,row=7)
 
         ttk.Button(self,text="Aufaddieren", command=self.calibrateMeas_Add).grid(column=0,row=8)
         ttk.Button(self,text="Abziehen", command=self.calibrateMeas_Subtract).grid(column=1,row=8)
@@ -66,26 +69,27 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         switchVal = self.calSelectCombo.current()
         print(switchVal)
         if switchVal == 0:
-            self.calibVals[0] = int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+            self.calibVals[0] = float(self.calValCoarseCombo.get())+float(self.calValFineCombo.get())
         if switchVal == 1:
-            self.calibVals[1] = int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+            self.calibVals[1] = float(self.calValCoarseCombo.get())+float(self.calValFineCombo.get())
         if switchVal == 2:
-            self.calibVals[2] = int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+            self.calibVals[2] = float(self.calValCoarseCombo.get())+float(self.calValFineCombo.get())
         if switchVal == 3:
-            self.calibVals[3] = int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+            self.calibVals[3] = float(self.calValCoarseCombo.get())+float(self.calValFineCombo.get())
         self.setMeasCalibration()
         self.saveCalValuesToCSV()
+        
 
     def calibrateMeas_Subtract(self):
         switchVal = self.calSelectCombo.current()
         if switchVal == 0:
-            self.calibVals[0] = -1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+            self.calibVals[0] = -1*(float(self.calValCoarseCombo.get())+float(self.calValFineCombo.get()))
         if switchVal == 1:
-            self.calibVals[1] = -1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+            self.calibVals[1] = -1*(float(self.calValCoarseCombo.get())+float(self.calValFineCombo.get()))
         if switchVal == 2:
-            self.calibVals[2] = -1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+            self.calibVals[2] = -1*(float(self.calValCoarseCombo.get())+float(self.calValFineCombo.get()))
         if switchVal == 3:
-            self.calibVals[3] = -1*int(self.calValCoarseCombo.get()+self.calValFineCombo.get())
+            self.calibVals[3] = -1*(float(self.calValCoarseCombo.get())+float(self.calValFineCombo.get()))
         self.setMeasCalibration()
         self.saveCalValuesToCSV()
 
@@ -108,6 +112,11 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         self.meas.ina226_setBusVoltOffset(self.calibVals[1])
         self.meas.ina226_setBusCurrOffset(self.calibVals[2])
         self.meas.ina226_setBusPowerOffset(self.calibVals[3])
+
+        self.shuntCalL.configure(text=self.meas.ina226_getShuntOffset())
+        self.busCalL.configure(text=self.meas.ina226_getBusOffset())
+        self.currCalL.configure(text=self.meas.ina226_getBusCurrOffset())
+        self.powCalL.configure(text=self.meas.ina226_getPowerOffset())
             
 
 

@@ -14,7 +14,9 @@ class ModulSpannungTEntladung(ttk.Frame):
 
         ttk.Frame.__init__(self,parent)
 
-        self.modulFrame = self
+        self.meas = SensorReadValuesOnly()
+
+        self.modulFrame = ttk.Frame(self,relief='ridge')
         self.modulFrame.config(width=100,height=100)
         self.modulFrame.grid(column=5,row=0, columnspan=2, rowspan=2)
 
@@ -25,15 +27,13 @@ class ModulSpannungTEntladung(ttk.Frame):
         self.indLabel = ttk.Label(self.modulFrame, text=self.indText)
         self.indLabel.grid(column=0,row=3)
 
-        self.meas = SensorRead(self.modulFrame)
-        self.meas.grid(column=1,row=1)
-
         self.deepDischarge()
 
     def deepDischarge(self):
         #auf Teststart warten
         
         self.cd = Countdown(self.modulFrame,30)
+    
         '''
         self.cd.grid(column=1,row=2)
             #zeit starten, bis t=30s muss spannung gestiegen sein
@@ -44,13 +44,13 @@ class ModulSpannungTEntladung(ttk.Frame):
     #eventuell in tools.py verlegen
     def checkStatus(self):
             #'ÄNDERN AUF 30
-        if self.meas.getVoltageCell > 0 & self.meas.getVoltageCell < 2.5:
+        if self.meas.ina226_getVoltageCell > 0 & self.meas.ina226_getVoltageCell < 2.5:
             self.indLabel.configure(text="Reduzierter Ladestrom")
         
-        if self.meas.getVoltageCell < 2.5 & self.cd.getTime() == 0:
+        if self.meas.ina226_getVoltageCell < 2.5 & self.cd.getTime() == 0:
             self.indLabel.configure(text="Ladegerät Error, LED prüfen")
 
-        if self.meas.getVoltageCell > 2.5:
+        if self.meas.ina226_getVoltageCell > 2.5:
             self.indLabel.configure(text="voller Ladestrom")
 
         if self.cd.getTime() == self.cd.getStartDur():
@@ -62,15 +62,13 @@ class ModulSpannungLSchluss(ttk.Frame):
         #super.__init__(self,parent)
         ttk.Frame.__init__(self,parent)
         
-        self.modulFrame = self
+        self.modulFrame = ttk.Frame(self,relief='ridge')
         self.modulFrame.config(width=100,height=100)
         self.modulFrame.grid(column=5,row=0, columnspan=2, rowspan=2)
 
         headLabel = ttk.Label(self.modulFrame, text="Modul Ladeschlussspannung",font='10')
         headLabel.grid(column=1,row=0)
 
-        self.meas = SensorRead(self.modulFrame)
-        self.meas.grid(column=1,row=1)
 
         maxBatVolt = ttk.Label(self,text="Ladeschlussspannung[V]:")
         maxBatVolt.grid(column=1,row=2)
@@ -95,15 +93,12 @@ class ModulSpannungUeIm(ttk.Frame):
         self.s = ttk.Style()
         self.s.configure('ILabelFrame.Label',background = 'green')
 
-        self.modulFrame = self
+        self.modulFrame = ttk.Frame(self,relief='ridge')
         self.modulFrame.config(width=100,height=100)
         self.modulFrame.grid(column=5,row=0, columnspan=2, rowspan=2)
 
         headLabel = ttk.Label(self.modulFrame, text="Modul Überladung/Imbalance", font='10')
         headLabel.grid(column=1,row=0)
-
-        meas = SensorRead(self)
-        meas.grid(column=1,row=1)
 
         self.SetUeFlagActiveFrame = ttk.Labelframe(self,style="ILabelFrame.Label")
         self.SetUeFlagActiveFrame.grid(column=1,row=2)

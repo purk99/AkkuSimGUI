@@ -1,3 +1,4 @@
+from pydoc import render_doc
 from threading import Thread
 from tkinter import *
 from tkinter import ttk
@@ -18,7 +19,7 @@ STOP_BIT = 0x03
 
 class SensorRead(ttk.Frame):
 
-    def __init__(self,parent):
+    def __init__(self,parent): 
 
         #I2C-Kommunikation initialisieren
         #self.ina226 = SMBus(1)
@@ -51,33 +52,35 @@ class SensorRead(ttk.Frame):
         #self.current_meas = 5
 
         ttk.Frame.__init__(self, parent)
+        
+        self.grid(sticky=NSEW)
 
-        sensFrame = self
-        sensFrame.grid()
+        sensFrame = ttk.Frame(self,relief='ridge')
+        sensFrame.grid(sticky=NSEW)
 
         vbl = ttk.Label(sensFrame, text="Spannung Batterie", font=20)
-        vbl.grid(column=2,row=1, sticky=W)
+        vbl.grid(column=0,row=1, sticky=W)
 
         self.voltageBatl = ttk.Label(sensFrame, text = self.voltBat, font=20)
-        self.voltageBatl.grid(column=3, row=1)
+        self.voltageBatl.grid(column=1, row=1, padx=5)
 
         self.vcl = ttk.Label(sensFrame,text="Spannung Zelle", font=20)
-        self.vcl.grid(column=2,row=2, sticky=W)
+        self.vcl.grid(column=0,row=2, sticky=W)
 
         self.voltageCelll = ttk.Label(sensFrame, text = self.voltCell, font=20)
-        self.voltageCelll.grid(column=3,row=2)
+        self.voltageCelll.grid(column=1,row=2, padx=5)
 
         ibl = ttk.Label(sensFrame,text="Batterie Gesamtstrom", font=20)
-        ibl.grid(column=2,row=3, sticky=W)
+        ibl.grid(column=0,row=3, sticky=W)
 
         self.currentBatl = ttk.Label(sensFrame, text = self.currBat, font=20)
-        self.currentBatl.grid(column=3,row=3)
+        self.currentBatl.grid(column=1,row=3, padx=5)
 
         startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.checkMeas)
-        startMeasB.grid(column=3,row=4, pady=2)
+        startMeasB.grid(column=0,row=4, pady=2)
 
         calB = ttk.Button(sensFrame,text="Kalibrierung",command=self.calib)
-        calB.grid(column=3,row=5)
+        calB.grid(column=0,row=5)
 
         self.readCalibrationValuesFromCSV()
         
@@ -177,7 +180,117 @@ class SensorRead(ttk.Frame):
     def ina226_getPowerOffset(self):
         return self.powerOffset
 
+class SensorReadValuesOnly():
+    def __init__(self):
+        self.ina226_adress = 0x40
+        self.ina226 = pi()
 
+        self.ina226_config_reg =    0   #R/W
+        self.ina226_shunt_reg =     1   #R
+        self.ina226_bus_reg =       2   #R
+        self.ina226_power_reg =     3   #R
+        self.ina226_curr_reg =      4   #R
+        self.ina226_cal_reg =       5   #R/W
+
+        self.currentLSB = float16
+        self.cal = int16
+        #I2C Ende
+
+        self.voltBat = float(10)
+        self.voltCell = float(10)
+        self.currBat = float(10)
+
+        self.busVoltOffset = 0
+        self.shuntVoltOffset = 0
+        self.busCurrOffset = 0
+        self.powerOffset = 0
+
+        self.ina226_calibrateReg(10,0.003)
+
+    #Auslesen von Register 
+    def ina226_readReg(self,adress):
+        h = self.ina226.i2c_open(1,self.ina226_adress)
+        #self.ina226.i2c_write_byte(h,adress)
+        recVal =    uint16(self.ina226.i2c_read_word_data(h,adress))
+        regVal =    uint16((recVal >> 8)|(recVal << 8))
+        self.ina226.i2c_close(h)
+        return regVal
+
+    def ina226_writeReg(self,adress,content = int16):
+        h = self.ina226.i2c_open(1,self.ina226_adress)
+        test = [content >> 8, content & 0xff]
+        self.ina226.i2c_write_i2c_block_data(h,adress,test)
+        self.ina226.i2c_close(h)
+
+    def ina226_calibrateReg(self, maxExpectCurr = uint16,rShunt = float16):
+        self.currentLSB = maxExpectCurr/(2**15)
+        self.cal = uint16(0.00512/(self.currentLSB*rShunt))
+        self.ina226_writeReg(self.ina226_cal_reg,self.cal)
+
+    def readCalibrationValuesFromCSV(self):
+        file = open('calibVals.CSV')
+        arr = numpy.loadtxt(file, delimiter=',')
+        
+        self.shuntVoltOffset    = arr[0]
+        self.busVoltOffset      = arr[1]
+        self.busCurrOffset      = arr[2]
+        self.powerOffset        = arr[3]
+
+    #kann zu testzwecken ausgelesen werden
+    def ina226_getShuntVoltage(self):
+        shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6) + (self.shuntVoltOffset))
+        return round(shuntVolt,4)
+
+    def ina226_getBusVoltage(self):
+        busVolt = float(self.ina226_readReg(self.ina226_bus_reg) * 1.25e-3 + self.busVoltOffset)
+        return round(busVolt,2)
+
+    def ina226_getCellVoltage(self):
+        cellVolt = self.ina226_getBusVoltage()/int(EepromDataComplete[2])
+        return round(cellVolt,2)
+
+    def ina226_getCurr(self):
+        busCurr = float(self.ina226_readReg(self.ina226_curr_reg)*self.currentLSB + self.busCurrOffset)
+        return round(busCurr,2)
+
+    def ina226_getPower(self):
+        busPow = float(self.ina226_readReg(self.ina226_power_reg)*25*self.currentLSB + self.powerOffset)
+        return busPow
+
+    def ina226_getVoltageBat(self):
+        return self.voltBat
+
+    def ina226_getVoltageCell(self): 
+        return self.voltCell
+
+    def ina226_getCurrBat(self):
+        return self.currBat
+    
+    def ina226_setShuntOffset(self,offset):
+        self.shuntVoltOffset = offset
+    
+    def ina226_setBusVoltOffset(self,offset):
+        self.busVoltOffset = offset
+    
+    def ina226_setBusCurrOffset(self,offset):
+        self.busCurrOffset = offset
+
+    def ina226_setBusPowerOffset(self,offset):
+        self.powerOffset = offset
+    
+    def ina226_getShuntOffset(self):
+        return self.shuntVoltOffset
+
+    def ina226_getBusOffset(self):
+        return self.busVoltOffset
+
+    def ina226_getBusCurrOffset(self):
+        return self.busCurrOffset
+
+    def ina226_getPowerOffset(self):
+        return self.powerOffset
+
+                
 class Countdown(ttk.Frame):
     def __init__(self,parent,duration):
         ttk.Frame.__init__(self, parent)
@@ -197,11 +310,6 @@ class Countdown(ttk.Frame):
         self.sb = ttk.Button(self,text="Counter starten", command = self.countdown)
         self.sb.grid(column=1,row=1)
 
-###########################################################
-###         damit über mehrere Funktionen auf Variablen
-###         zugegriffen werden kann
-###         --> self. vor jede variable, damit wird
-##                          Klassenvariable erzeugt
 
     #Hier wird countdown erzeugt
     #callback nach 1s auf Funktion selbst

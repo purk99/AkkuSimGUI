@@ -15,13 +15,26 @@ class ModulSpannung(Toplevel):
         super().__init__(master = master)   
         #self.nt = Toplevel(root)
         self.grid()
-        
-        frame2 = ttk.Frame(self)
-        frame2.grid()
 
-        label2 = ttk.Label(frame2,text="Testmodul Spannung", font='30',padding=5)
+        self.modulframe = ttk.Frame(self)
+        self.modulframe.grid(column=0,row=1)
+
+        label2 = ttk.Label(self,text="Testmodul Spannung", font='30',padding=5)
         label2.grid(column=1,row=0)
 
+        self.meas = SensorRead(self.modulframe)
+        self.meas.grid(column=1,row=1)
+
+        self.vDisCh = ModulSpannungTEntladung(self.modulframe)
+        self.vDisCh.grid(column=0,row=1)
+
+        self.oV = ModulSpannungUeIm(self.modulframe)
+        self.oV.grid(column=0,row=2)        
+
+        eb = ttk.Button(self,text="Fenster schließen",command=self.destroy)
+        eb.grid(column=10,row=10)
+
+    '''
         button = ttk.Button(frame2,text="Modul Tiefenentladung",padding=5, command = self.showModuleTEntladung)
         button.grid(column=1,row=1,padx=5,pady=5)
 
@@ -30,19 +43,7 @@ class ModulSpannung(Toplevel):
 
         bUe = ttk.Button(frame2, text="Modul Überladung/Imbalance",padding=5, command = self.showModuleUe)
         bUe.grid(column=1,row=3,padx=5,pady=5)
-
-        eb = ttk.Button(frame2,text="Fenster schließen",command=self.destroy)
-        eb.grid(column=10,row=10)
-
-    def showModuleTEntladung(self):
-        ModulSpannungTEntladung(self)
-
-    def showModuleLSpannung(self):
-        ModulSpannungLSchluss(self)
-
-    def showModuleUe(self):
-        ModulSpannungUeIm(self)
-
+'''
 class ModulEeprom(Toplevel):
     def __init__(self,master = None):
         super().__init__(master = master)
@@ -78,10 +79,7 @@ class ModulTemperatur(Toplevel):
         self.attributes('-fullscreen', True)
 
         self.mainframe = ttk.Frame(self)
-        self.mainframe.grid(sticky=NSEW)
-
-        self.modulframe = ttk.Frame(self.mainframe)
-        self.modulframe.grid(column=0,row=1)
+        self.mainframe.grid(sticky=NSEW)        
 
         headLabel = ttk.Label(self.mainframe, text="Testmodul Temperaturen", font='20')
         headLabel.grid(column=1,row=0)

@@ -1,5 +1,3 @@
-
-from re import T
 from tkinter import *
 from tkinter import ttk
 
@@ -7,15 +5,16 @@ from tools_V21 import *
 from EepromData import *
 from EepromAccess import *
 
-class ModulTempHysterese(ttk.Frame):
-    def __init__(self,parent):
-        ttk.Frame.__init__(self,parent)
+class ModulTempHysterese(Toplevel):
+    def __init__(self,master=None):
+        super().__init__(master=master)
+        self.attributes('-fullscreen', True)
+        self.grid()
 
         #show actual charge parameters 
         self.chargePar = EepromChargeParam(self)
         self.chargePar.grid(column=0,row=2,sticky=S)
         
-
         self.meas = SensorRead(self)
         self.meas.grid(column=1,row=1,padx=5)
         
@@ -65,10 +64,10 @@ class ModulTempHysterese(ttk.Frame):
         self.tSL.grid(column=1,row=11)
 
         eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
-        eb.grid(column=2,row=20)
+        eb.grid(column=1,row=10)
 
     def checkTestStatus(self):
-        if self.meas.getCurrBat() == 0:
+        if self.meas.ina226_getCurrBat() == 0:
             self.tSL.configure(text="Ladegerät Error")
         self.tSL.after(2000,self.checkTestStatus)
         
@@ -121,47 +120,55 @@ class ModulTempHysterese(ttk.Frame):
         InfoData[0] = temp
         self.eeprom.writeNTC()
 
-class ModulTempNTCError(ttk.Frame):
-    def __init__(self,parent):
-        ttk.Frame.__init__(self,parent)
+class ModulTempNTCError(Toplevel):
+    def __init__(self,master=None):
+        super().__init__(master=master)
+        self.attributes('-fullscreen', True)
+        self.grid()        
 
-        self.modulframe = self
+        self.modulframe = ttk.Frame(self)
+        self.modulframe.grid(column=1,row=0)
 
         #erst auf Raspbi aktivieren, sonst Error
         self.comm = EepromControl()
 
-        self.meas = SensorRead(self)
+        self.meas = SensorRead(self.modulframe)
         self.meas.grid(column=1,row=1)
 
         headLabel = ttk.Label(self,text="Prüfmodul NTC Error", font='20')
         headLabel.grid(column=1,row=0)
 
-        self.shortB = ttk.Button(self,text="NTC kurzschließen",command=self.shortNTC)
+        self.shortB = ttk.Button(self.modulframe,text="NTC kurzschließen",command=self.shortNTC)
         self.shortB.grid(column=0,row=1)
 
-        self.discB = ttk.Button(self,text="NTC ausstecken", command=self.discNTC)
+        self.discB = ttk.Button(self.modulframe,text="NTC ausstecken", command=self.discNTC)
         self.discB.grid(column=0,row=2)
 
-        self.infoL = ttk.Label(self,text="NTC Normalzustand")
+        self.infoL = ttk.Label(self,text="NTC Normalzustand", font='20')
         self.infoL.grid(column=0,row=5)
 
+        eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
+        eb.grid(column=1,row=10)        
+
     def shortNTC(self):
-        test = self.comm.readSingleRegister(0x2)
+        test = self.comm.readNTC()
 
         if test != 0xf0:
             test = 0xf0
 
-        self.comm.writeSingleRegister(0x2,test)
+        self.comm.setNTCValue(test)
+        self.comm.writeNTC()
 
         self.infoL.configure(text="NTC kurzgeschlossen")
 
     def discNTC(self):
-        test = self.comm.readSingleRegister(0x2)
+        test = self.comm.readNTC()
         test = 0
 
         if test != 0x0f:
             test = 0x0f
 
-        self.comm.writeSingleRegister(0x2,test)
+        self.comm.setNTCValue(test)
+        self.comm.writeNTC(test)
         self.infoL.configure(text="NTC ausgesteckt")
 

@@ -43,7 +43,6 @@ class EepromChargeParam(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
         
-        #eeprom = EepromControl()
         self.arduninoEeprom = EepromControl()
 
         self.grid()
@@ -96,15 +95,15 @@ class EepromChargeParam(ttk.Frame):
         ttk.Label(self.valF,text="I_max").grid(column=3,row=3,padx=1, sticky=W)
         imaxLabel = ttk.Label(self.valF,text=EepromDataComplete[117])
         imaxLabel.grid(column=4,row=3)
-
+        '''
         ttk.Label(self.valF,text="variable").grid(column=3, row=4,padx=1, sticky=W)
         parActLabel = ttk.Label(self.valF,text=EepromDataComplete[119])
-        parActLabel.grid(column=4,row=5)
-
+        parActLabel.grid(column=4,row=5)        
+        '''
         self.varChargeActText = StringVar()
         self.varChargeActText.set("Variable Parameter: ein")
         self.changeParActB = ttk.Button(self.parChangeF,textvariable=self.varChargeActText,command=self.changeVarCharge)
-        self.changeParActB.grid(column=0,row=0)
+        self.changeParActB.grid(column=1,row=0)
 
         ###Änderungen an Charge-Parametern###
         paramChangeL = ttk.Label(self.parChangeF,text="Parameter: ")
@@ -141,8 +140,8 @@ class EepromChargeParam(ttk.Frame):
                                 umaxLabel,
                                 icoldLabel,
                                 iwarmLabel,
-                                imaxLabel,
-                                parActLabel
+                                imaxLabel
+                                #parActLabel
                              ]
 
     def updateChargeLabels(self):

@@ -275,6 +275,12 @@ class EepromControl():
     def writeOvervoltage(self):
         self.sendPackage(uartCMD["voltageProtectWrite"],1,InfoData[1])
 
+    def setNTCValue(self,value):
+        InfoData[0] = value
+
+    def setOvValue(self,value):
+        InfoData[1] = value
+
     def setEeprom(self):
         #Akkupack Infos 1/3
         EepromDataComplete[0] = EepromDataDict["safetyB1"]

@@ -47,21 +47,21 @@ class ModulEeprom(Toplevel):
     def __init__(self,master = None):
         super().__init__(master = master)
 
-        modulframe = ttk.Frame(self, padding=10)
-        modulframe.grid()
+        self.modulframe = ttk.Frame(self, padding=10)
+        self.modulframe.grid()
 
-        headLabel = ttk.Label(modulframe, text="Testmodul EEPROM",font='15')
+        headLabel = ttk.Label(self.modulframe, text="Testmodul EEPROM",font='15')
         headLabel.grid(column=1,row=0)
 
         #CC,CV,CVende, Temperaturbereiche
-        buttonLcyc = ttk.Button(modulframe, text="Testprogramm Ladezyklen", padding=5,command=self.showModulEepromCycleParam)
+        buttonLcyc = ttk.Button(self.modulframe, text="Testprogramm Ladezyklen", padding=5,command=self.showModulEepromCycleParam)
         buttonLcyc.grid(column=0,row=1,padx=5,pady=5)
 
         #12V Akku als 18V Akku definieren
-        buttonErr = ttk.Button(modulframe,text="Testprogramm Ladeparameter", padding = 5, command=self.showModulEepromChargeParam)
+        buttonErr = ttk.Button(self.modulframe,text="Testprogramm Ladeparameter", padding = 5, command=self.showModulEepromChargeParam)
         buttonErr.grid(column=0,row=2,padx=5,pady=5)
 
-        eb = ttk.Button(modulframe,text="Fenster schließen",command=self.destroy)
+        eb = ttk.Button(self.modulframe,text="Fenster schließen",command=self.destroy)
         eb.grid(column=10,row=10)
 
     def showModulEepromChargeParam(self):
@@ -77,28 +77,30 @@ class ModulTemperatur(Toplevel):
         super().__init__(master = master)
         self.attributes('-fullscreen', True)
 
-        modulframe = ttk.Frame(self)
-        modulframe.grid()
+        self.mainframe = ttk.Frame(self)
+        self.mainframe.grid(sticky=NSEW)
 
-        headLabel = ttk.Label(modulframe, text="Testmodul Temperaturen", font='20')
+        self.modulframe = ttk.Frame(self.mainframe)
+        self.modulframe.grid(column=0,row=1)
+
+        headLabel = ttk.Label(self.mainframe, text="Testmodul Temperaturen", font='20')
         headLabel.grid(column=1,row=0)
 
-        ntcB = ttk.Button(self,text="Testmodul NTC Error",padding=10, command=self.showModulNTCError)
-        ntcB.grid(column=0, row=1)
+        ntcB = ttk.Button(self.mainframe,text="Testmodul NTC Error",padding=10, command=self.showModulNTCError)
+        ntcB.grid(column=0, row=1, sticky=EW)
 
-        hystB = ttk.Button(self,text="Testmodul Temperaturhysterese",padding=10, command=self.showModulTempHysterese)
+        hystB = ttk.Button(self.mainframe,text="Testmodul Temperaturhysterese",padding=10, command=self.showModulTempHysterese)
         hystB.grid(column=0, row=2)
 
-        eb = ttk.Button(modulframe,text="Programm Beenden",command = self.destroy) 
-        eb.grid(column=1,row=10, sticky=E)
+        eb = ttk.Button(self.mainframe,text="Programm Beenden",command = self.destroy) 
+        eb.grid(column=0,row=10, sticky=EW)
 
     def showModulNTCError(self):
-        cF = ModulTempNTCError(self)
-        cF.grid(column=0,row=10)
+        ModulTempNTCError()
 
     def showModulTempHysterese(self):
-        cF = ModulTempHysterese(self)
-        cF.grid(column=0,row=1)
+        ModulTempHysterese()
+
 
 class ModulKapazität(Toplevel):
     def __init__(self,master = None):

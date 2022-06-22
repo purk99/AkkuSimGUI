@@ -68,6 +68,7 @@ InfoDataDict = {
 #Indizierung prüfen
 EepromDataComplete = [None] * 256
 
+#contains data for ntc(0) and ov(1)
 InfoData = [InfoDataDict["NTCvalue"],
             InfoDataDict["Overvoltage"]
 

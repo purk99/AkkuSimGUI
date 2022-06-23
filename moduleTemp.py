@@ -18,6 +18,9 @@ class ModulTempHysterese(Toplevel):
         self.meas = SensorRead(self)
         self.meas.grid(column=1,row=1,padx=5)
         
+        self.ntc = ModulTempNTCError(self)
+        self.ntc.grid(column=1,row=2,sticky=NSEW)
+        
         self.valF = ttk.Frame(self, relief = 'ridge')
         self.valF.grid(column=0,row=1, sticky=NSEW)
         self.valF.columnconfigure(0,weight=1)
@@ -120,23 +123,24 @@ class ModulTempHysterese(Toplevel):
         InfoData[0] = temp
         self.eeprom.writeNTC()
 
-class ModulTempNTCError(Toplevel):
-    def __init__(self,master=None):
-        super().__init__(master=master)
-        self.attributes('-fullscreen', True)
-        self.grid()        
+class ModulTempNTCError(ttk.Frame):
+    def __init__(self,parent):
+        ttk.Frame.__init__(self,parent)
+        self.grid()
+        self.configure(relief='ridge')
+        
+        headLabel = ttk.Label(self,text="Prüfmodul NTC Error", font='15')
+        headLabel.grid(column=1,row=0)
 
         self.modulframe = ttk.Frame(self)
-        self.modulframe.grid(column=1,row=0)
+        self.modulframe.grid(column=1,row=1)
 
         #erst auf Raspbi aktivieren, sonst Error
         self.comm = EepromControl()
+        self.comm.setEeprom()
 
-        self.meas = SensorRead(self.modulframe)
-        self.meas.grid(column=1,row=1)
-
-        headLabel = ttk.Label(self,text="Prüfmodul NTC Error", font='20')
-        headLabel.grid(column=1,row=0)
+        #self.meas = SensorRead(self.modulframe)
+        #self.meas.grid(column=1,row=1)        
 
         self.shortB = ttk.Button(self.modulframe,text="NTC kurzschließen",command=self.shortNTC)
         self.shortB.grid(column=0,row=1)
@@ -144,31 +148,21 @@ class ModulTempNTCError(Toplevel):
         self.discB = ttk.Button(self.modulframe,text="NTC ausstecken", command=self.discNTC)
         self.discB.grid(column=0,row=2)
 
-        self.infoL = ttk.Label(self,text="NTC Normalzustand", font='20')
-        self.infoL.grid(column=0,row=5)
+        self.infoL = ttk.Label(self.modulframe,text="NTC Normalzustand", font='20')
+        self.infoL.grid(column=0,row=3)
 
-        eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
-        eb.grid(column=1,row=10)        
+        #eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
+        #eb.grid(column=1,row=10)        
 
     def shortNTC(self):
-        test = self.comm.readNTC()
-
-        if test != 0xf0:
-            test = 0xf0
-
-        self.comm.setNTCValue(test)
+        self.comm.setNTCValue(0xF0)
         self.comm.writeNTC()
 
         self.infoL.configure(text="NTC kurzgeschlossen")
 
-    def discNTC(self):
-        test = self.comm.readNTC()
-        test = 0
+    def discNTC(self):       
+        self.comm.setNTCValue(0x0F)
+        self.comm.writeNTC()
 
-        if test != 0x0f:
-            test = 0x0f
-
-        self.comm.setNTCValue(test)
-        self.comm.writeNTC(test)
         self.infoL.configure(text="NTC ausgesteckt")
 

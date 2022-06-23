@@ -198,9 +198,6 @@ class SensorReadValuesOnly():
         self.cal = int16
         #I2C Ende
 
-        self.maxExpCurr = 10
-        self.shuntResValue = 0.01
-
         self.voltBat = float(10)
         self.voltCell = float(10)
         self.currBat = float(10)
@@ -210,7 +207,7 @@ class SensorReadValuesOnly():
         self.busCurrOffset = 0
         self.powerOffset = 0
 
-        self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
+        self.ina226_calibrateReg(6,0.01)
 
     #Auslesen von Register 
     def ina226_readReg(self,adress):
@@ -282,12 +279,6 @@ class SensorReadValuesOnly():
 
     def ina226_setBusPowerOffset(self,offset):
         self.powerOffset = offset
-
-    def ina226_setMaxExpCurr(self,value):
-        self.maxExpCurr = int(value)
-
-    def ina226_setShuntResValue(self,value):
-        self.shuntResValue = int(value)
     
     def ina226_getShuntOffset(self):
         return self.shuntVoltOffset
@@ -300,12 +291,6 @@ class SensorReadValuesOnly():
 
     def ina226_getPowerOffset(self):
         return self.powerOffset
-
-    def ina226_getMaxExpCurr(self):
-        return self.maxExpCurr
-
-    def ina226_getShuntResValue(self):
-        return self.shuntResValue
 
                 
 class Countdown(ttk.Frame):
@@ -339,20 +324,17 @@ class Countdown(ttk.Frame):
     #callback nach 1s auf Funktion selbst
     #--> python after()
     def countdown(self):
-        resetter = True
         if self.dur >= 0:   
-            self.secFormat = '{:02d}'.format(self.dur)            
+            self.secFormat = '{:02d}'.format(self.dur)
+            self.tl.after(1000,self.countdown)
             #schedule timer to update icon every second
             self.tl.configure(text=self.secFormat)
             self.dur -= 1
-
-            resetter = False
-            self.tl.after(1000,self.countdown)
         #um Timer wieder starten zu können
         #self.dur wird auf durStart +1 gesetzt, damit Variablen 
         #in Abhängigkeit von self.dur nicht sofort wieder umspringen, sondern erst nach neuem Start
-        if resetter == True:
-            self.dur = self.durStart
+        else:
+            self.dur = self.durStart + 1
     
     #Hilfsfunktionen
     def getTime(self):

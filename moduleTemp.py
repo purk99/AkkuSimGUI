@@ -137,6 +137,7 @@ class ModulTempNTCError(ttk.Frame):
 
         #erst auf Raspbi aktivieren, sonst Error
         self.comm = EepromControl()
+        self.comm.setEeprom()
 
         #self.meas = SensorRead(self.modulframe)
         #self.meas.grid(column=1,row=1)        
@@ -154,24 +155,14 @@ class ModulTempNTCError(ttk.Frame):
         #eb.grid(column=1,row=10)        
 
     def shortNTC(self):
-        test = self.comm.readNTC()
-
-        if test != 0xf0:
-            test = 0xf0
-
-        self.comm.setNTCValue(test)
+        self.comm.setNTCValue(0xF0)
         self.comm.writeNTC()
 
         self.infoL.configure(text="NTC kurzgeschlossen")
 
-    def discNTC(self):
-        test = self.comm.readNTC()
-        test = 0
+    def discNTC(self):       
+        self.comm.setNTCValue(0x0F)
+        self.comm.writeNTC()
 
-        if test != 0x0f:
-            test = 0x0f
-
-        self.comm.setNTCValue(test)
-        self.comm.writeNTC(test)
         self.infoL.configure(text="NTC ausgesteckt")
 

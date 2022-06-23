@@ -82,11 +82,6 @@ class SensorRead(ttk.Frame):
         calB = ttk.Button(sensFrame,text="Kalibrierung",command=self.calib)
         calB.grid(column=0,row=5)
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-
-        self.ina226_calibrateReg(10,0.01)
->>>>>>> Stashed changes
 =======
 
         self.ina226_calibrateReg(10,0.01)
@@ -207,12 +202,6 @@ class SensorReadValuesOnly():
         #I2C Ende
 
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-        self.maxExpCurr = 10
-        self.shuntResValue = 0.01
-
->>>>>>> Stashed changes
 =======
         self.maxExpCurr = 10
         self.shuntResValue = 0.01
@@ -228,11 +217,7 @@ class SensorReadValuesOnly():
         self.powerOffset = 0
 
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
         self.ina226_calibrateReg(10,0.003)
-=======
-        self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
->>>>>>> Stashed changes
 =======
         self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
 >>>>>>> Stashed changes
@@ -308,19 +293,13 @@ class SensorReadValuesOnly():
     def ina226_setBusPowerOffset(self,offset):
         self.powerOffset = offset
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
 =======
-=======
->>>>>>> Stashed changes
 
     def ina226_setMaxExpCurr(self,value):
         self.maxExpCurr = int(value)
 
     def ina226_setShuntResValue(self,value):
         self.shuntResValue = int(value)
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
     
     def ina226_getShuntOffset(self):
@@ -335,19 +314,13 @@ class SensorReadValuesOnly():
     def ina226_getPowerOffset(self):
         return self.powerOffset
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
 =======
-=======
->>>>>>> Stashed changes
 
     def ina226_getMaxExpCurr(self):
         return self.maxExpCurr
 
     def ina226_getShuntResValue(self):
         return self.shuntResValue
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
 >>>>>>> Stashed changes
 
                 

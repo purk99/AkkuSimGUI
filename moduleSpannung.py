@@ -13,13 +13,9 @@ class ModulSpannungTEntladung(ttk.Frame):
     
         ttk.Frame.__init__(self,parent)
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
 
         self.meas = SensorReadValuesOnly()
 
-=======
-                   
->>>>>>> Stashed changes
 =======
                    
 >>>>>>> Stashed changes
@@ -39,7 +35,6 @@ class ModulSpannungTEntladung(ttk.Frame):
         self.indText = "Test inaktiv"
         self.indLabel = ttk.Label(self.modulFrame, text=self.indText)
         self.indLabel.grid(column=0,row=3, sticky=W)
-<<<<<<< Updated upstream
 
 <<<<<<< Updated upstream
         self.deepDischarge()
@@ -50,18 +45,6 @@ class ModulSpannungTEntladung(ttk.Frame):
         self.cd = Countdown(self.modulFrame,30)
     
 =======
-
-    def startMeas(self):
-        #wait for test to start        
-        self.meas = SensorReadValuesOnly() 
-        self.indLabel.configure(text="Test aktiv,\nwarte auf Ladestrom")
-        self.waitForCurrent()
-        
-
-    def waitForCurrent(self):
->>>>>>> Stashed changes
-=======
-
 
     def startMeas(self):
         #wait for test to start        
@@ -87,7 +70,6 @@ class ModulSpannungTEntladung(ttk.Frame):
     #display status according to timer 
     def checkStatus(self):
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
             #'ÄNDERN AUF 30
         if self.meas.ina226_getVoltageCell > 0 & self.meas.ina226_getVoltageCell < 2.5:
             self.indLabel.configure(text="Reduzierter Ladestrom")
@@ -96,16 +78,6 @@ class ModulSpannungTEntladung(ttk.Frame):
             self.indLabel.configure(text="Ladegerät Error, LED prüfen")
 
         if self.meas.ina226_getVoltageCell > 2.5:
-=======
-
-        if int(self.meas.ina226_getVoltageCell()) > 0 & int(self.meas.ina226_getVoltageCell()) <= 2.5: #& int(self.meas.ina226_getCurr()) > 1 :
-            self.indLabel.configure(text="Reduzierter Ladestrom")
-
-        if self.cd.getTime == 0 & (int(self.meas.ina226_getCurr()) > self.meas.ina226_getMaxExpCurr() & int(self.meas.ina226_getCurr()) < 1):
-            self.indLabel.configure(text="Ladegerät Error, LED prüfen")
-
-        elif (int(self.meas.ina226_getCurr()) < self.meas.ina226_getMaxExpCurr() & int(self.meas.ina226_getCurr()) > 1):
->>>>>>> Stashed changes
 =======
 
         if int(self.meas.ina226_getVoltageCell()) > 0 & int(self.meas.ina226_getVoltageCell()) <= 2.5: #& int(self.meas.ina226_getCurr()) > 1 :
@@ -169,7 +141,6 @@ class ModulSpannungUeIm(ttk.Frame):
         headLabel.grid(column=1,row=0)
 
 <<<<<<< Updated upstream
-<<<<<<< Updated upstream
         self.SetUeFlagActiveFrame = ttk.Labelframe(self,style="ILabelFrame.Label")
         self.SetUeFlagActiveFrame.grid(column=1,row=2)
 =======
@@ -189,23 +160,6 @@ class ModulSpannungUeIm(ttk.Frame):
         bSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag setzen",command=self.setUeFlagActive)#,style="ILabelFrame.Label")
         bSetUe.grid(column=0,row=3, sticky=EW)
 
-=======
-        #self.SetUeFlagActiveFrame = ttk.Labelframe(self,style="ILabelFrame.Label")
-        #self.SetUeFlagActiveFrame.grid(column=1,row=2)
-
-        #bSetUe = ttk.Button(self.SetUeFlagActiveFrame,text="Überspannungsflag setzen",command=self.setUeFlagActive)#,style="ILabelFrame.Label")
-        #bSetUe.grid(column=0,row=3, sticky=EW)
-
-        #bUnSetUe = ttk.Button(self.SetUeFlagActiveFrame,text="Überspannungsflag deaktivieren", command=self.setUeFlagInactive)
-        #bUnSetUe.grid(column=0,row=4)
-
-        self.tsB = ttk.Button(self.modulFrame,text="Modul starten", command=self.startModule)
-        self.tsB.grid(column=0,row=1)
-
-        bSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag setzen",command=self.setUeFlagActive)#,style="ILabelFrame.Label")
-        bSetUe.grid(column=0,row=3, sticky=EW)
-
->>>>>>> Stashed changes
         bUnSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag deaktivieren", command=self.setUeFlagInactive)
         bUnSetUe.grid(column=0,row=4)
 

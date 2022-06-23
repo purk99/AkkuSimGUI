@@ -12,7 +12,6 @@ from tools_V21 import *
 
 class ModulSpannung(Toplevel):
     def __init__(self, master = None):
-<<<<<<< Updated upstream
         super().__init__(master = master)   
         #self.nt = Toplevel(root)
         self.grid()
@@ -20,27 +19,12 @@ class ModulSpannung(Toplevel):
         self.modulframe = ttk.Frame(self)
         self.modulframe.grid(column=0,row=1)
 
-=======
-        super().__init__(master = master)
-        
-        eeprom = EepromControl()
-        
-        self.modulframe = ttk.Frame(self, relief='ridge')
-        self.modulframe.grid(column=0,row=1)
-
->>>>>>> Stashed changes
         label2 = ttk.Label(self,text="Testmodul Spannung", font='30',padding=5)
         label2.grid(column=1,row=0)
-        
+
         self.meas = SensorRead(self.modulframe)
         self.meas.grid(column=1,row=1)
 
-<<<<<<< Updated upstream
-        self.meas = SensorRead(self.modulframe)
-        self.meas.grid(column=1,row=1)
-
-=======
->>>>>>> Stashed changes
         self.vDisCh = ModulSpannungTEntladung(self.modulframe)
         self.vDisCh.grid(column=0,row=1)
 
@@ -48,7 +32,6 @@ class ModulSpannung(Toplevel):
         self.oV.grid(column=0,row=2)        
 
         eb = ttk.Button(self,text="Fenster schließen",command=self.destroy)
-<<<<<<< Updated upstream
         eb.grid(column=10,row=10)
 
     '''
@@ -61,10 +44,6 @@ class ModulSpannung(Toplevel):
         bUe = ttk.Button(frame2, text="Modul Überladung/Imbalance",padding=5, command = self.showModuleUe)
         bUe.grid(column=1,row=3,padx=5,pady=5)
 '''
-=======
-        eb.grid(column=1,row=5)
-
->>>>>>> Stashed changes
 class ModulEeprom(Toplevel):
     def __init__(self,master = None):
         super().__init__(master = master)

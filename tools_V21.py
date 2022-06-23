@@ -81,11 +81,6 @@ class SensorRead(ttk.Frame):
 
         calB = ttk.Button(sensFrame,text="Kalibrierung",command=self.calib)
         calB.grid(column=0,row=5)
-<<<<<<< Updated upstream
-=======
-
-        self.ina226_calibrateReg(10,0.01)
->>>>>>> Stashed changes
 
         self.readCalibrationValuesFromCSV()
         
@@ -201,12 +196,6 @@ class SensorReadValuesOnly():
         self.cal = int16
         #I2C Ende
 
-<<<<<<< Updated upstream
-=======
-        self.maxExpCurr = 10
-        self.shuntResValue = 0.01
-
->>>>>>> Stashed changes
         self.voltBat = float(10)
         self.voltCell = float(10)
         self.currBat = float(10)
@@ -216,11 +205,7 @@ class SensorReadValuesOnly():
         self.busCurrOffset = 0
         self.powerOffset = 0
 
-<<<<<<< Updated upstream
         self.ina226_calibrateReg(10,0.003)
-=======
-        self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
->>>>>>> Stashed changes
 
     #Auslesen von Register 
     def ina226_readReg(self,adress):
@@ -292,15 +277,6 @@ class SensorReadValuesOnly():
 
     def ina226_setBusPowerOffset(self,offset):
         self.powerOffset = offset
-<<<<<<< Updated upstream
-=======
-
-    def ina226_setMaxExpCurr(self,value):
-        self.maxExpCurr = int(value)
-
-    def ina226_setShuntResValue(self,value):
-        self.shuntResValue = int(value)
->>>>>>> Stashed changes
     
     def ina226_getShuntOffset(self):
         return self.shuntVoltOffset
@@ -313,15 +289,6 @@ class SensorReadValuesOnly():
 
     def ina226_getPowerOffset(self):
         return self.powerOffset
-<<<<<<< Updated upstream
-=======
-
-    def ina226_getMaxExpCurr(self):
-        return self.maxExpCurr
-
-    def ina226_getShuntResValue(self):
-        return self.shuntResValue
->>>>>>> Stashed changes
 
                 
 class Countdown(ttk.Frame):
@@ -336,33 +303,30 @@ class Countdown(ttk.Frame):
         self.dur = duration
         self.durStart = self.dur
         self.secFormat = self.dur
-        
-        ttk.Label(self, text="Timer", font='20').grid(column=0,row=1,sticky=W)
 
-        self.tl = ttk.Label(self, text=self.secFormat, font='20')
-        self.tl.grid(column=1,row=1)
+        self.tl = ttk.Label(self, text=self.secFormat)
+        self.tl.grid(column=2,row=1)
 
-        #self.sb = ttk.Button(self,text="Test starten", command = self.countdown)
-        #self.sb.grid(column=1,row=1)
+        self.sb = ttk.Button(self,text="Counter starten", command = self.countdown)
+        self.sb.grid(column=1,row=1)
 
 
     #Hier wird countdown erzeugt
     #callback nach 1s auf Funktion selbst
     #--> python after()
     def countdown(self):
-        self.dur = self.durStart
-        self.countdownStart()     
-        #um Timer wieder starten zu können
-        #self.dur wird auf durStart +1 gesetzt, damit Variablen 
-        #in Abhängigkeit von self.dur nicht sofort wieder umspringen, sondern erst nach neuem Start
-    
-    def countdownStart(self):
-        if self.dur >= 0:  
-            self.secFormat = '{:02d}'.format(self.dur)            
+        if self.dur >= 0:   
+            self.secFormat = '{:02d}'.format(self.dur)
+            self.tl.after(1000,self.countdown)
             #schedule timer to update icon every second
             self.tl.configure(text=self.secFormat)
             self.dur -= 1
-            self.tl.after(1000,self.countdown)
+        #um Timer wieder starten zu können
+        #self.dur wird auf durStart +1 gesetzt, damit Variablen 
+        #in Abhängigkeit von self.dur nicht sofort wieder umspringen, sondern erst nach neuem Start
+        else:
+            self.dur = self.durStart + 1
+    
     #Hilfsfunktionen
     def getTime(self):
         return self.dur

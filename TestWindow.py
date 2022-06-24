@@ -10,6 +10,8 @@ import pigpio
 from tkinter import ttk
 from tkinter import *
 
+'''
+
 file = open('calibVals.CSV')
 arr = numpy.loadtxt(file,delimiter=',')
 print(arr)
@@ -28,7 +30,7 @@ x = turnIntoTuple()
 print(x[1])
 
 '''
-fields = list(range(10))
+fields = list(range(4))
 
 f = open('calibVals.CSV','w')
 writer = writer(f)
@@ -38,7 +40,7 @@ f.close()
 
 #neuer Kommentar
 
-
+'''
 root = Tk()
 
 labelframe = LabelFrame(root, text="This is a LabelFrame")

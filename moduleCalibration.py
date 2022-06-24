@@ -98,6 +98,7 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         f = open('calibVals.CSV','w')
         writer = csv.writer(f)
         writer.writerow(self.calibVals)
+        f.close()
         
 
     def readCalValuesFromCSV(self):

@@ -108,19 +108,19 @@ class ModulSpannungUeIm(ttk.Frame):
         self.modulFrame.grid(column=5,row=0, columnspan=2, rowspan=2)
 
         headLabel = ttk.Label(self.modulFrame, text="Modul Überladung/Imbalance", font='10')
-        headLabel.grid(column=0,row=0, padx=2, pady=2, sticky=W)
-
-        self.tsB = ttk.Button(self.modulFrame,text="Modul starten", command=self.startModule)
-        self.tsB.grid(column=0,row=1)
+        headLabel.grid(column=0,row=0, padx=2, pady=2, sticky=W)        
 
         bSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag setzen",command=self.setUeFlagActive)#,style="ILabelFrame.Label")
-        bSetUe.grid(column=0,row=3, sticky=EW)
+        bSetUe.grid(column=0,row=1, sticky=EW)
 
         bUnSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag deaktivieren", command=self.setUeFlagInactive)
-        bUnSetUe.grid(column=0,row=4)
+        bUnSetUe.grid(column=0,row=2)
 
-        self.tStatusL = ttk.Label(self.modulFrame,text="Test inaktiv", font='20')
-        self.tStatusL.grid(column=0,row=5)
+        self.tsB = ttk.Button(self.modulFrame,text="Modul starten", command=self.startModule)
+        self.tsB.grid(column=5,row=5,sticky=E)
+
+        self.tStatusL = ttk.Label(self.modulFrame,text="Test inaktiv", font='15')
+        self.tStatusL.grid(column=0,row=5, padx=5, pady=5, sticky=W)
 
 
     def startModule(self):

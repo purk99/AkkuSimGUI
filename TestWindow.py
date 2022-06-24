@@ -77,13 +77,17 @@ class Countdown(ttk.Frame):
         self.startCountdown()
 
     def startCountdown(self):
-        print(self.dur)
+        self.secFormat = '{:02d}'.format(self.dur)   
+        self.tl.configure(text=self.secFormat)
+        print(self.dur)        
         if self.dur > 0:   
             self.secFormat = '{:02d}'.format(self.dur)            
             #schedule timer to update icon every second
-            self.tl.configure(text=self.secFormat)
+            #self.tl.configure(text=self.secFormat)            
             self.dur -= 1
+            #self.tl.configure(text=self.secFormat)
             self.tl.after(1000,self.startCountdown)
+
     
     def getTime(self):
         return self.dur
@@ -107,7 +111,7 @@ frame = ttk.Frame(root)
 frame.grid()
 
 cd = Countdown(frame,10)
-ttk.Button(frame,text="start",command=cd.countdown()).grid(column=5,row=5)
+ttk.Button(frame,text="start",command=cd.countdown).grid(column=5,row=5)
 
 root.mainloop()
 

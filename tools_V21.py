@@ -343,11 +343,13 @@ class Countdown(ttk.Frame):
         self.startCountdown()
 
     def startCountdown(self):
-        print(self.dur)
+        #update happens before if condition
+        self.secFormat = '{:02d}'.format(self.dur)   
+        self.tl.configure(text=self.secFormat)
+        print(self.dur)        
         if self.dur > 0:   
             self.secFormat = '{:02d}'.format(self.dur)            
             #schedule timer to update icon every second
-            self.tl.configure(text=self.secFormat)
             self.dur -= 1
             self.tl.after(1000,self.startCountdown)
     

@@ -9,6 +9,7 @@ import pigpio
 
 from tkinter import ttk
 from tkinter import *
+#from tools_V21 import Countdown
 
 '''
 
@@ -29,7 +30,6 @@ print(type(turnIntoTuple()))
 x = turnIntoTuple()
 print(x[1])
 
-'''
 fields = list(range(4))
 
 f = open('calibVals.CSV','w')
@@ -41,6 +41,56 @@ f.close()
 #neuer Kommentar
 
 '''
+
+class Countdown(ttk.Frame):
+    def __init__(self,parent,duration):
+        ttk.Frame.__init__(self, parent)
+        #super().__init__()
+        
+        self.grid()
+
+        #variable für Ausgabe
+        #ÄNDERN AUF 30, NUR ZUM TESTEN AUF 10
+        self.dur = duration
+        self.durStart = self.dur
+        self.secFormat = self.dur
+        
+        ttk.Label(self, text="Timer", font='20').grid(column=0,row=0,sticky=W)
+
+        self.tl = ttk.Label(self, text=self.secFormat, font='20')
+        self.tl.grid(column=1,row=0)
+
+        ttk.Label(self,text="Sek.",font='20').grid(column=2,row=0)
+
+###########################################################
+###         damit über mehrere Funktionen auf Variablen
+###         zugegriffen werden kann
+###         --> self. vor jede variable, damit wird
+##                          Klassenvariable erzeugt
+
+    #Hier wird countdown erzeugt
+    #callback nach 1s auf Funktion selbst
+    #--> python after()
+
+    def countdown(self):
+        self.dur=self.durStart
+        self.startCountdown()
+
+    def startCountdown(self):
+        print(self.dur)
+        if self.dur > 0:   
+            self.secFormat = '{:02d}'.format(self.dur)            
+            #schedule timer to update icon every second
+            self.tl.configure(text=self.secFormat)
+            self.dur -= 1
+            self.tl.after(1000,self.startCountdown)
+    
+    def getTime(self):
+        return self.dur
+    def getStartDur(self):
+        return self.durStart
+'''
+
 root = Tk()
 
 labelframe = LabelFrame(root, text="This is a LabelFrame")
@@ -48,8 +98,7 @@ labelframe.pack(fill="both", expand="yes")
  
 left = Label(labelframe, text="Inside the LabelFrame")
 left.pack()
- 
-root.mainloop()
+'''
 
 root = Tk()
 root.geometry("800x480")
@@ -57,6 +106,12 @@ root.geometry("800x480")
 frame = ttk.Frame(root)
 frame.grid()
 
+cd = Countdown(frame,10)
+ttk.Button(frame,text="start",command=cd.countdown()).grid(column=5,row=5)
+
+root.mainloop()
+
+'''
 counter = 0
 counter1 = 0
 lfF = [None] * 65

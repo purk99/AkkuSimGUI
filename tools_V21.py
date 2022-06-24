@@ -321,13 +321,12 @@ class Countdown(ttk.Frame):
         self.durStart = self.dur
         self.secFormat = self.dur
         
-        ttk.Label(self, text="Timer", font='20').grid(column=0,row=1,sticky=W)
+        ttk.Label(self, text="Timer", font='20').grid(column=0,row=0,sticky=W)
 
         self.tl = ttk.Label(self, text=self.secFormat, font='20')
-        self.tl.grid(column=1,row=1)
+        self.tl.grid(column=1,row=0)
 
-        #self.sb = ttk.Button(self,text="Test starten", command = self.countdown)
-        #self.sb.grid(column=1,row=1)
+        ttk.Label(self,text="Sek.",font='20').grid(column=2,row=0)
 
 ###########################################################
 ###         damit über mehrere Funktionen auf Variablen
@@ -338,23 +337,20 @@ class Countdown(ttk.Frame):
     #Hier wird countdown erzeugt
     #callback nach 1s auf Funktion selbst
     #--> python after()
+
     def countdown(self):
-        resetter = True
-        if self.dur >= 0:   
+        self.dur=self.durStart
+        self.startCountdown()
+
+    def startCountdown(self):
+        print(self.dur)
+        if self.dur > 0:   
             self.secFormat = '{:02d}'.format(self.dur)            
             #schedule timer to update icon every second
             self.tl.configure(text=self.secFormat)
             self.dur -= 1
-
-            resetter = False
-            self.tl.after(1000,self.countdown)
-        #um Timer wieder starten zu können
-        #self.dur wird auf durStart +1 gesetzt, damit Variablen 
-        #in Abhängigkeit von self.dur nicht sofort wieder umspringen, sondern erst nach neuem Start
-        if resetter == True:
-            self.dur = self.durStart
+            self.tl.after(1000,self.startCountdown)
     
-    #Hilfsfunktionen
     def getTime(self):
         return self.dur
     def getStartDur(self):

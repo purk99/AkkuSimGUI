@@ -20,7 +20,7 @@ class ModulSpannungTEntladung(ttk.Frame):
         headLabel.grid(column=0,row=0)        
         
         self.cd = Countdown(self.modulFrame,30)
-        self.cd.grid(column=0,row=1)
+        self.cd.grid(column=0,row=1, sticky=EW)
         
         self.tSB = ttk.Button(self.modulFrame,text="Modul starten", command=self.startMeas)
         self.tSB.grid(column=0,row=2,sticky=W)

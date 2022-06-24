@@ -37,6 +37,8 @@ class SensorRead(ttk.Frame):
         self.cal = int16
         #I2C Ende
 
+        self.maxExpCurr = 10
+        self.shuntResValue = 0.01
 
         self.voltBat = float(10)
         self.voltCell = float(10)
@@ -56,7 +58,7 @@ class SensorRead(ttk.Frame):
         self.grid(sticky=NSEW)
 
         sensFrame = ttk.Frame(self,relief='ridge')
-        sensFrame.grid(sticky=NSEW)
+        sensFrame.grid(padx=3, pady=3, sticky=NSEW)
 
         vbl = ttk.Label(sensFrame, text="Spannung Batterie", font=20)
         vbl.grid(column=0,row=1, sticky=W)
@@ -77,13 +79,12 @@ class SensorRead(ttk.Frame):
         self.currentBatl.grid(column=1,row=3, padx=5)
 
         startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.checkMeas)
-        startMeasB.grid(column=0,row=4, pady=2)
+        startMeasB.grid(column=0,row=4, pady=2, sticky=EW)
 
-        calB = ttk.Button(sensFrame,text="Kalibrierung",command=self.calib)
-        calB.grid(column=0,row=5)
+        #calB = ttk.Button(sensFrame,text="Neukalibrierung",command=self.calib)
+        #calB.grid(column=0,row=5)
 
-        self.ina226_calibrateReg(10,0.01)
-
+        self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
         self.readCalibrationValuesFromCSV()
         
     def calib(self):
@@ -97,9 +98,9 @@ class SensorRead(ttk.Frame):
     #Testfunktion zum Prüfen der Funktion von I2C Kommunikation
     def test(self):
         cellVoltage = self.ina226_getBusVoltage()/int(EepromDataComplete[2])
-        self.currentBatl.configure(text = self.ina226_getCurr())
-        self.voltageCelll.configure(text = round(cellVoltage,4))
-        self.voltageBatl.configure(text = self.ina226_getBusVoltage())
+        self.currentBatl.configure(text = '{:05.2f}'.format(self.ina226_getCurr()))
+        self.voltageCelll.configure(text = '{:05.2f}'.format(cellVoltage))#round(cellVoltage,4)
+        self.voltageBatl.configure(text = '{:05.2f}'.format(self.ina226_getBusVoltage()))
 
     #Auslesen von Register 
     def ina226_readReg(self,adress):
@@ -196,6 +197,7 @@ class SensorReadValuesOnly():
 
         self.currentLSB = float16
         self.cal = int16
+
         #I2C Ende
 
         self.maxExpCurr = 10
@@ -210,7 +212,10 @@ class SensorReadValuesOnly():
         self.busCurrOffset = 0
         self.powerOffset = 0
 
+        #initialize calibration Register on INA226 Chip
         self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
+        #read correction Values from CSV File
+        self.readCalibrationValuesFromCSV()
 
     #Auslesen von Register 
     def ina226_readReg(self,adress):
@@ -321,12 +326,12 @@ class Countdown(ttk.Frame):
         self.durStart = self.dur
         self.secFormat = self.dur
         
-        ttk.Label(self, text="Timer", font='20').grid(column=0,row=0,sticky=W)
+        ttk.Label(self, text="Timer", font='20').grid(column=0,row=0, padx=5,sticky=W)
 
         self.tl = ttk.Label(self, text=self.secFormat, font='20')
         self.tl.grid(column=1,row=0)
 
-        ttk.Label(self,text="Sek.",font='20').grid(column=2,row=0)
+        ttk.Label(self,text="Sek.",font='20').grid(column=2,row=0, padx=5)
 
 ###########################################################
 ###         damit über mehrere Funktionen auf Variablen
@@ -346,7 +351,6 @@ class Countdown(ttk.Frame):
         #update happens before if condition
         self.secFormat = '{:02d}'.format(self.dur)   
         self.tl.configure(text=self.secFormat)
-        print(self.dur)        
         if self.dur > 0:   
             self.secFormat = '{:02d}'.format(self.dur)            
             #schedule timer to update icon every second

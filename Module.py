@@ -20,7 +20,7 @@ class ModulSpannung(Toplevel):
         self.modulframe.grid(column=0,row=1)
 
         label2 = ttk.Label(self,text="Testmodul Spannung", font='30',padding=5)
-        label2.grid(column=1,row=0)
+        label2.grid(column=0,row=0)
         
         self.meas = SensorRead(self.modulframe)
         self.meas.grid(column=1,row=1)
@@ -32,7 +32,7 @@ class ModulSpannung(Toplevel):
         self.oV.grid(column=0,row=2)        
 
         eb = ttk.Button(self,text="Fenster schließen",command=self.destroy)
-        eb.grid(column=1,row=5)
+        eb.grid(column=0,row=5, ipadx=5, ipady=5 , sticky=E)
 
 class ModulEeprom(Toplevel):
     def __init__(self,master = None):

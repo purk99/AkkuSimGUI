@@ -84,12 +84,13 @@ class SensorRead(ttk.Frame):
         #calB = ttk.Button(sensFrame,text="Neukalibrierung",command=self.calib)
         #calB.grid(column=0,row=5)
 
+        self.ina226_writeReg(self.ina226_config_reg, 0x45A7)
         self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
         self.readCalibrationValuesFromCSV()
         
-    def calib(self):
-        #Config-register beschreiben
-        self.ina226_calibrateReg(6,0.01)
+    #def calib(self):
+    #   #Config-register beschreiben
+    #    self.ina226_calibrateReg(6,0.01)
 
     def checkMeas(self):
         self.updateValues()

@@ -1,4 +1,3 @@
-from pydoc import render_doc
 from threading import Thread
 from tkinter import *
 from tkinter import ttk
@@ -43,6 +42,7 @@ class SensorRead(ttk.Frame):
         self.voltBat = float(10)
         self.voltCell = float(10)
         self.currBat = float(10)
+        self.powBat = float(10)
 
         self.busVoltOffset = 0
         self.shuntVoltOffset = 0
@@ -78,8 +78,14 @@ class SensorRead(ttk.Frame):
         self.currentBatl = ttk.Label(sensFrame, text = self.currBat, font=20)
         self.currentBatl.grid(column=1,row=3, padx=5)
 
+        self.sVL = ttk.Label(sensFrame, text="Shuntspannung", font=20)
+        self.sVL.grid(column=0,row=4, padx=5)
+
+        self.shuntVoltL = ttk.Label(sensFrame,text=self.powBat, font=20)
+        self.shuntVoltL.grid(column=1,row=4,padx=5)
+
         startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.checkMeas)
-        startMeasB.grid(column=0,row=4, pady=2, sticky=EW)
+        startMeasB.grid(column=0,row=5, pady=2, sticky=EW)
 
         #calB = ttk.Button(sensFrame,text="Neukalibrierung",command=self.calib)
         #calB.grid(column=0,row=5)
@@ -102,6 +108,7 @@ class SensorRead(ttk.Frame):
         self.currentBatl.configure(text = '{:05.2f}'.format(self.ina226_getCurr()))
         self.voltageCelll.configure(text = '{:05.2f}'.format(cellVoltage))#round(cellVoltage,4)
         self.voltageBatl.configure(text = '{:05.2f}'.format(self.ina226_getBusVoltage()))
+        self.shuntVoltL.configure(text='{:05.2f}'.format(self.ina226_getShuntVoltage()))
 
     #Auslesen von Register 
     def ina226_readReg(self,adress):
@@ -215,6 +222,7 @@ class SensorReadValuesOnly():
 
         #initialize calibration Register on INA226 Chip
         self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
+        self.ina226_writeReg(self.ina226_config_reg, 0x45A7)
         #read correction Values from CSV File
         self.readCalibrationValuesFromCSV()
 

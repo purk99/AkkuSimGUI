@@ -44,6 +44,7 @@ class EepromChargeParam(ttk.Frame):
         ttk.Frame.__init__(self,parent)
         
         self.arduninoEeprom = EepromControl()
+        self.arduninoEeprom.setEeprom()
 
         self.grid()
         self.configure(relief="ridge")
@@ -167,7 +168,7 @@ class EepromChargeParam(ttk.Frame):
 
     def changeVarCharge(self):
         
-        if EepromDataCharge[10] == 0xF0:
+        if EepromDataCharge[10] != 0x0F:
             self.varChargeActText.set("Variable Parameter: ein")
             EepromDataComplete[119] = 0x0F
             self.changeEepromData(119,EepromDataComplete[119])

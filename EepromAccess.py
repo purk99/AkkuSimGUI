@@ -193,7 +193,7 @@ class EepromChargeParam(ttk.Frame):
             self.changeEepromData(119,EepromDataComplete[119])
             self.updateChargeLabels()
         else:
-            self.varChargeActText.set("Variable Parameter: ein")
+            self.varChargeActText.set("Variable Parameter: aus")
             EepromDataComplete[119] = 0xF0
             self.changeEepromData(119,EepromDataComplete[119])
             self.updateChargeLabels()

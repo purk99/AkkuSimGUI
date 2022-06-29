@@ -187,13 +187,8 @@ class EepromChargeParam(ttk.Frame):
 
     def changeVarCharge(self):
         
-<<<<<<< Updated upstream
         if EepromDataCharge[10] != 0x0F:
             self.varChargeActText.set("Variable Parameter: ein")
-=======
-        if EepromDataComplete[119] != 0x0F:
-            self.varChargeActText.set("Variable Parameter: aus")
->>>>>>> Stashed changes
             EepromDataComplete[119] = 0x0F
             self.changeEepromData(119,EepromDataComplete[119])
             self.updateChargeLabels()

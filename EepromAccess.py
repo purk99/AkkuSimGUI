@@ -56,46 +56,65 @@ class EepromChargeParam(ttk.Frame):
         self.parChangeF.grid(column=1,row=1)
 
         ttk.Label(self,text="Ladeparameter",font='15').grid(column=1,row=0,sticky=EW)
-    
-        ttk.Label(self.valF,text="T_min").grid(column=0,row=1,padx=1,sticky=W)
-        tminLabel = ttk.Label(self.valF,text=EepromDataComplete[108])
-        tminLabel.grid(column=1,row=1)
 
-        ttk.Label(self.valF,text="T_cold").grid(column=0,row=2,padx=1, sticky=W)
-        tcoldLabel = ttk.Label(self.valF,text=EepromDataComplete[109])
-        tcoldLabel.grid(column=1,row=2)
+        tMin = ttk.Labelframe(self.valF,text="T_min")
+        tMin.grid(column=0,row=0,padx=1)
+        tminLabel = ttk.Label(tMin,text=EepromDataComplete[108])
+        tminLabel.grid(column=0,row=0)
 
-        ttk.Label(self.valF,text="T_warm").grid(column=0,row=3,padx=1, sticky=W)
-        twarmLabel = ttk.Label(self.valF,text=EepromDataComplete[110])
-        twarmLabel.grid(column=1,row=3)
+        tCold = ttk.Labelframe(self.valF,text="T_cold")
+        tCold.grid(column=0,row=1,padx=1)
+        #ttk.Label(self.valF,text="T_cold").grid(column=0,row=2,padx=1, sticky=W)
+        tcoldLabel = ttk.Label(tCold,text=EepromDataComplete[109])
+        tcoldLabel.grid(column=0,row=0)
 
-        ttk.Label(self.valF,text="T_max").grid(column=0,row=4,padx=1, sticky=W)
-        tmaxLabel = ttk.Label(self.valF,text=EepromDataComplete[111])
-        tmaxLabel.grid(column=1,row=4)
+        tWarm = ttk.Labelframe(self.valF,text="T_warm")
+        tWarm.grid(column=0,row=2,padx=1)
+        #ttk.Label(self.valF,text="T_warm").grid(column=0,row=3,padx=1, sticky=W)
+        twarmLabel = ttk.Label(tWarm,text=EepromDataComplete[110])
+        twarmLabel.grid(column=0,row=0)
 
-        ttk.Label(self.valF,text="U_cold").grid(column=0,row=5,padx=1, sticky=W)
-        ucoldLabel = ttk.Label(self.valF,text=EepromDataComplete[112])
-        ucoldLabel.grid(column=1,row=5)
+        tMax = ttk.Labelframe(self.valF,text="T_max")
+        tMax.grid(column=0,row=3,padx=1)
+        #ttk.Label(self.valF,text="T_max").grid(column=0,row=4,padx=1, sticky=W)
+        tmaxLabel = ttk.Label(tMax,text=EepromDataComplete[111])
+        tmaxLabel.grid(column=0,row=0)
 
-        ttk.Label(self.valF,text="U_warm").grid(column=0,row=6,padx=1, sticky=W)
-        uwarmLabel = ttk.Label(self.valF,text=EepromDataComplete[113])
-        uwarmLabel.grid(column=1,row=6)
+        uCold = ttk.Labelframe(self.valF,text="U_cold")
+        uCold.grid(column=0,row=4,padx=1)
+        #ttk.Label(self.valF,text="U_cold").grid(column=0,row=5,padx=1, sticky=W)
+        ucoldLabel = ttk.Label(uCold,text=EepromDataComplete[112])
+        ucoldLabel.grid(column=0,row=0)
 
-        ttk.Label(self.valF,text="U_max").grid(column=0,row=7,padx=1, sticky=W)
-        umaxLabel = ttk.Label(self.valF,text=EepromDataComplete[114])
-        umaxLabel.grid(column=1,row=7)
+        uWarm = ttk.Labelframe(self.valF,text="U_warm")
+        uWarm.grid(column=1,row=0,padx=1)
+        #ttk.Label(self.valF,text="U_warm").grid(column=0,row=6,padx=1, sticky=W)
+        uwarmLabel = ttk.Label(uWarm,text=EepromDataComplete[113])
+        uwarmLabel.grid(column=0,row=0)
+
+        uMax = ttk.Labelframe(self.valF,text="U_max")
+        uMax.grid(column=1,row=1,padx=1)
+        #ttk.Label(self.valF,text="U_max").grid(column=0,row=7,padx=1, sticky=W)
+        umaxLabel = ttk.Label(uMax,text=EepromDataComplete[114])
+        umaxLabel.grid(column=0,row=0)
         
-        ttk.Label(self.valF,text="I_cold").grid(column=3,row=1,padx=1, sticky=W)
-        icoldLabel = ttk.Label(self.valF,text=EepromDataComplete[115])
-        icoldLabel.grid(column=4,row=1)
+        iCold = ttk.Labelframe(self.valF,text="I_cold")
+        iCold.grid(column=1,row=2,padx=1)
+        #ttk.Label(self.valF,text="I_cold").grid(column=3,row=1,padx=1, sticky=W)
+        icoldLabel = ttk.Label(iCold,text=EepromDataComplete[115])
+        icoldLabel.grid(column=0,row=0)
 
-        ttk.Label(self.valF,text="I_warm").grid(column=3,row=2,padx=1, sticky=W)
-        iwarmLabel = ttk.Label(self.valF,text=EepromDataComplete[116])
-        iwarmLabel.grid(column=4,row=2)
+        iWarm= ttk.Labelframe(self.valF,text="I_warm")
+        iWarm.grid(column=1,row=3,padx=1)
+        #ttk.Label(self.valF,text="I_warm").grid(column=3,row=2,padx=1, sticky=W)
+        iwarmLabel = ttk.Label(iWarm,text=EepromDataComplete[116])
+        iwarmLabel.grid(column=0,row=0)
 
-        ttk.Label(self.valF,text="I_max").grid(column=3,row=3,padx=1, sticky=W)
-        imaxLabel = ttk.Label(self.valF,text=EepromDataComplete[117])
-        imaxLabel.grid(column=4,row=3)
+        iMax= ttk.Labelframe(self.valF,text="I_max")
+        iMax.grid(column=1,row=4,padx=1)
+        #ttk.Label(self.valF,text="I_max").grid(column=3,row=3,padx=1, sticky=W)
+        imaxLabel = ttk.Label(iMax,text=EepromDataComplete[117])
+        imaxLabel.grid(column=0,row=0)
         '''
         ttk.Label(self.valF,text="variable").grid(column=3, row=4,padx=1, sticky=W)
         parActLabel = ttk.Label(self.valF,text=EepromDataComplete[119])
@@ -168,15 +187,20 @@ class EepromChargeParam(ttk.Frame):
 
     def changeVarCharge(self):
         
+<<<<<<< Updated upstream
         if EepromDataCharge[10] != 0x0F:
             self.varChargeActText.set("Variable Parameter: ein")
+=======
+        if EepromDataComplete[119] != 0x0F:
+            self.varChargeActText.set("Variable Parameter: aus")
+>>>>>>> Stashed changes
             EepromDataComplete[119] = 0x0F
             self.changeEepromData(119,EepromDataComplete[119])
             self.updateChargeLabels()
         else:
-            self.varChargeActText.set("Variable Parameter: aus")
+            self.varChargeActText.set("Variable Parameter: ein")
             EepromDataComplete[119] = 0xF0
-            self.changeEepromData(119,EepromDataCharge[119])
+            self.changeEepromData(119,EepromDataComplete[119])
             self.updateChargeLabels()
 
 #kann weg

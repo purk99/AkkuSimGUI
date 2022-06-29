@@ -35,8 +35,8 @@ class root(tk.Tk):
         temperaturTest = ttk.Button(mainframe,text="Testmodul Temperatur",padding=10,width=75, command=self.openWindowTemp)
         temperaturTest.grid(column=1,row=6,pady=5)
 
-        capacityTest = ttk.Button(mainframe,text="Testmodul Kapazität",padding=10,width=75,command=self.openWindowCap)
-        capacityTest.grid(column=1,row=7,pady=5)
+        #capacityTest = ttk.Button(mainframe,text="Testmodul Kapazität",padding=10,width=75,command=self.openWindowCap)
+        #capacityTest.grid(column=1,row=7,pady=5)
 
         calibration = ttk.Button(mainframe,text="Kalibrierungsmodul",padding=10,width=75,command=self.openWindowCal)
         calibration.grid(column=1,row=8,pady=5)

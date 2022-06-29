@@ -66,7 +66,7 @@ InfoDataDict = {
 #bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
 #in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
 #Indizierung prüfen
-EepromDataComplete = [None] * 256
+EepromDataComplete = [1] * 256
 
 #contains data for ntc(0) and ov(1)
 InfoData = [InfoDataDict["NTCvalue"],

@@ -35,31 +35,26 @@ class ModulSpannungTEntladung(ttk.Frame):
         self.waitForCurrent()
         
 
-    def waitForCurrent(self):
-        '''
-        if self.meas.ina226_getCurr() < self.meas.ina226_getMaxExpCurr() & self.meas.ina226_getCurr() > 1:
+    def waitForCurrent(self):        
+        if int(self.meas.ina226_getCurr()) > 1:
             self.checkStatus()
             self.cd.countdown()
         else:
             self.indLabel.after(500,self.waitForCurrent)
-        '''
-        #for testing
-        self.cd.countdown()
-        self.checkStatus()
-        
     
     #display status according to timer 
     def checkStatus(self):
-
-        #if int(self.meas.ina226_getVoltageCell()) > 0 & int(self.meas.ina226_getVoltageCell()) <= 2.5: #& int(self.meas.ina226_getCurr()) > 1 :
-        #   self.indLabel.configure(text="Reduzierter Ladestrom")
-
-        if self.cd.getTime() == 0 & (int(self.meas.ina226_getCurr()) > self.meas.ina226_getMaxExpCurr() | int(self.meas.ina226_getCurr()) < 1):
-            self.indLabel.configure(text="Ladegerät Error, LED prüfen")
-
-        elif (int(self.meas.ina226_getCurr()) < self.meas.ina226_getMaxExpCurr() & int(self.meas.ina226_getCurr()) > 1):
+        
+        if (self.meas.ina226_getCurr() > 1.5) & (self.meas.ina226_getVoltageCell() > 2.5):
             self.indLabel.configure(text="voller Ladestrom")
+            
+        elif (self.cd.getTime() == 0) & (int(self.meas.ina226_getCurr()) < 1) & (self.meas.ina226_getVoltageCell() <= 2.5):
+            self.indLabel.configure(text="Ladegerät Error, LED prüfen")        
 
+        else:# (float(self.meas.ina226_getVoltageCell()) <= 2.5) & (int(self.meas.ina226_getCurr()) < 2):
+           self.indLabel.configure(text="Reduzierter Ladestrom")
+
+        
         self.indLabel.after(500,self.checkStatus) 
         #if self.cd.getTime() == self.cd.getStartDur():
         #   self.indLabel.configure(text=self.indText)

@@ -121,7 +121,7 @@ class EepromChargeParam(ttk.Frame):
         parActLabel.grid(column=4,row=5)        
         '''
         self.varChargeActText = StringVar()
-        self.varChargeActText.set("Variable Parameter: ein")
+        self.varChargeActText.set("Variable Parameter: inaktiv")
         self.changeParActB = ttk.Button(self.parChangeF,textvariable=self.varChargeActText,command=self.changeVarCharge)
         self.changeParActB.grid(column=1,row=0)
 
@@ -132,6 +132,7 @@ class EepromChargeParam(ttk.Frame):
         #Combobox
         self.combo = ttk.Combobox(self.parChangeF,values=[  "T_min",
                                             "T_cold",
+                                            "T_warm",
                                             "T_max",
                                             "U_cold",
                                             "U_warm",
@@ -154,6 +155,7 @@ class EepromChargeParam(ttk.Frame):
         
         self.tchargeLabels = [  tminLabel,
                                 tcoldLabel,
+                                twarmLabel,
                                 tmaxLabel,
                                 ucoldLabel,
                                 uwarmLabel,
@@ -187,18 +189,18 @@ class EepromChargeParam(ttk.Frame):
 
     def changeVarCharge(self):
         
-        if EepromDataCharge[10] != 0x0F:
-            self.varChargeActText.set("Variable Parameter: ein")
+        if EepromDataComplete[119] != 0x0F:
+            self.varChargeActText.set("Variable Parameter: aktiv")
             EepromDataComplete[119] = 0x0F
             self.changeEepromData(119,EepromDataComplete[119])
             self.updateChargeLabels()
         else:
-            self.varChargeActText.set("Variable Parameter: aus")
+            self.varChargeActText.set("Variable Parameter: inaktiv")
             EepromDataComplete[119] = 0xF0
             self.changeEepromData(119,EepromDataComplete[119])
             self.updateChargeLabels()
 
-#kann weg
+#currently not used
 class EepromParamChange(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)

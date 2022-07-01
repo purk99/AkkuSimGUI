@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import StringVar, Toplevel, ttk
 from tkinter import font
 from turtle import width
+from tkinter import *
 
 import serial
 from time import sleep
@@ -15,40 +16,55 @@ class root(tk.Tk):
         super().__init__()
 
         self.title("Klasse")
-        self.grid()
+        #self.grid()
         self.attributes('-fullscreen',True)
 
         mainframe = ttk.Frame(self, padding= 10, relief="ridge", borderwidth=5)
-        mainframe.grid(sticky=NSEW)
-        mainframe.columnconfigure(0, weight=1)
-        mainframe.rowconfigure(0, weight=1)
+        mainframe.pack(fill="both", expand="yes")
+        #mainframe.grid(sticky=NSEW)
+        #mainframe.columnconfigure(0, weight=1)
+        #mainframe.rowconfigure(0, weight=1)
+
+        headLabel = ttk.Label(mainframe,text="Akkuprüfeinheit V2", font=('bold','40'))
+        headLabel.pack()
+
+        label = ttk.Label(mainframe, text="Modul wählen",font='30')
+        #label.grid(row=0)
+        label.pack()
 
         voltageTest = ttk.Button(mainframe,text="Testmodul Spannung",padding=10,width=75,command = self.openWindowSpannung)
-        voltageTest.grid(column=1,row=3,pady=5)
+        #voltageTest.grid(row=3,pady=5)
+        voltageTest.pack(pady=5)
 
         eepromTest  = ttk.Button(mainframe,text="Testmodul EEPROM",padding=10,width=75, command=self.openWindowEeprom)
-        eepromTest.grid(column=1,row=4,pady=5)
+        #eepromTest.grid(row=4,pady=5)
+        eepromTest.pack(pady=5)
 
         #stromTest   = ttk.Button(mainframe,text="Testmodus Ladestrom",padding=10,width=75)
         #stromTest.grid(column=1,row=5,pady=5)
 
         temperaturTest = ttk.Button(mainframe,text="Testmodul Temperatur",padding=10,width=75, command=self.openWindowTemp)
-        temperaturTest.grid(column=1,row=6,pady=5)
+        #temperaturTest.grid(row=6,pady=5)
+        temperaturTest.pack(pady=5)
 
         #capacityTest = ttk.Button(mainframe,text="Testmodul Kapazität",padding=10,width=75,command=self.openWindowCap)
         #capacityTest.grid(column=1,row=7,pady=5)
 
         calibration = ttk.Button(mainframe,text="Kalibrierungsmodul",padding=10,width=75,command=self.openWindowCal)
-        calibration.grid(column=1,row=8,pady=5)
+        #calibration.grid(row=8,pady=5)
+        calibration.pack(pady=5)
         #zum testen genutzt
         #button = ttk.Button(mainframe, text = "nächstes Fenster öffnen",command = self.openNewWindow)
         #button.grid(column=1,row=1)
 
-        label = ttk.Label(mainframe, text="Modul wählen",font='30')
-        label.grid(column=1,row=0)
+        
 
         eb = ttk.Button(mainframe,text="Programm Beenden",command = self.destroy) 
-        eb.grid(column=1,row=10)
+        #eb.grid(row=10)
+        eb.pack(pady=5)
+
+        #self.pack(fill="both", expand="yes")
+
 
     def openWindowSpannung(self):
         ModulSpannung() 

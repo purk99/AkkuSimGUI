@@ -17,21 +17,22 @@ class ModulSpannung(Toplevel):
         self.attributes('-fullscreen',True)
         
         eeprom = EepromControl()
+        eeprom.setEeprom()
         
         self.modulframe = ttk.Frame(self, relief='ridge')
-        self.modulframe.grid(column=0,row=1)
+        self.modulframe.grid(column=0,row=1,padx=3,pady=3, ipadx=3, ipady=3)
 
         label2 = ttk.Label(self,text="Testmodul Spannung", font='30',padding=5)
         label2.grid(column=0,row=0)
         
         self.meas = SensorRead(self.modulframe)
-        self.meas.grid(column=1,row=1)
+        self.meas.grid(column=1,row=0, ipady=3)
 
         self.vDisCh = ModulSpannungTEntladung(self.modulframe)
-        self.vDisCh.grid(column=0,row=1)
+        self.vDisCh.grid(column=0,row=0,ipady=3)
 
         self.oV = ModulSpannungUeIm(self.modulframe)
-        self.oV.grid(column=0,row=2)        
+        self.oV.grid(column=0,row=1)        
 
         eb = ttk.Button(self,text="Fenster schließen",command=self.destroy)
         eb.grid(column=0,row=5, ipadx=5, ipady=5 , sticky=E)
@@ -132,9 +133,9 @@ class ModulTemperatur(Toplevel):
         self.tAL = ttk.Label(self.valF,text=self.tempAktuell,font='15')
         self.tAL.grid(column=1,row=10)
 
-        self.testStatus = ttk.Label(self.valF,text="Teststatus",font='15').grid(column=0,row=11)
-        self.tSL = ttk.Label(self.valF,text="Okay",font='15')
-        self.tSL.grid(column=1,row=11)
+        #self.testStatus = ttk.Label(self.valF,text="Teststatus",font='15').grid(column=0,row=11)
+        #self.tSL = ttk.Label(self.valF,text="Okay",font='15')
+        #self.tSL.grid(column=1,row=11)
 
         eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
         eb.grid(column=1,row=10)

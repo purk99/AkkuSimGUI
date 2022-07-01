@@ -9,22 +9,23 @@ class ModulSpannungTEntladung(ttk.Frame):
     def __init__(self,parent):
     
         ttk.Frame.__init__(self,parent)
+        self.grid(sticky=NSEW)
                    
         self.modulFrame = ttk.Frame(self,relief='ridge')
-        self.modulFrame.config(width=100,height=100)
-        self.modulFrame.grid(column=0,row=0, columnspan=2, rowspan=2)
+        #self.modulFrame.config(width=100,height=100)
+        self.modulFrame.grid(column=0,row=0,sticky=NSEW)
         
-        headLabel = ttk.Label(self.modulFrame, text="Modul Tiefenentladung",font='20')
+        headLabel = ttk.Label(self, text="Modul Tiefenentladung",font='20')
         headLabel.grid(column=0,row=0, padx=2, pady=2, sticky=W)        
         
-        self.cd = Countdown(self.modulFrame,30)
+        self.cd = Countdown(self,30)
         self.cd.grid(column=0, row=1, padx=5, sticky=EW)
         
-        self.tSB = ttk.Button(self.modulFrame,text="Modul starten", command=self.startMeas)
-        self.tSB.grid(column=1,row=2,padx=5,pady=5, ipadx=5, sticky=W)
+        self.tSB = ttk.Button(self,text="Modul starten", command=self.startMeas)
+        self.tSB.grid(column=5,row=2,padx=5,pady=5, ipadx=5, sticky=W)
 
         self.indText = "Test inaktiv"
-        self.indLabel = ttk.Label(self.modulFrame, text=self.indText,font='15')
+        self.indLabel = ttk.Label(self, text=self.indText,font='15')
         self.indLabel.grid(column=0,row=2, padx=5, pady=5, sticky=W)
 
 
@@ -44,20 +45,14 @@ class ModulSpannungTEntladung(ttk.Frame):
     
     #display status according to timer 
     def checkStatus(self):
-        
-        if (self.meas.ina226_getCurr() > 1.5) & (self.meas.ina226_getVoltageCell() > 2.5):
-            self.indLabel.configure(text="voller Ladestrom")
-            
-        elif (self.cd.getTime() == 0) & (int(self.meas.ina226_getCurr()) < 1) & (self.meas.ina226_getVoltageCell() <= 2.5):
-            self.indLabel.configure(text="Ladegerät Error, LED prüfen")        
+        errorCheck = False
+        if int(self.meas.ina226_getCurr() < 1):
+            outputString = "Ladegerät Error nach \n{} Sekunden".format(self.cd.getTime())
+            self.indLabel.configure(text=outputString)
+            errorCheck = True
 
-        else:# (float(self.meas.ina226_getVoltageCell()) <= 2.5) & (int(self.meas.ina226_getCurr()) < 2):
-           self.indLabel.configure(text="Reduzierter Ladestrom")
-
-        
-        self.indLabel.after(500,self.checkStatus) 
-        #if self.cd.getTime() == self.cd.getStartDur():
-        #   self.indLabel.configure(text=self.indText)
+        if errorCheck == False:
+            self.indLabel.after(500,self.checkStatus) 
              
                 
 class ModulSpannungLSchluss(ttk.Frame):
@@ -109,7 +104,7 @@ class ModulSpannungUeIm(ttk.Frame):
         bSetUe.grid(column=0,row=1, sticky=EW)
 
         bUnSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag deaktivieren", command=self.setUeFlagInactive)
-        bUnSetUe.grid(column=0,row=2)
+        bUnSetUe.grid(column=0,row=2, sticky=EW)
 
         self.tsB = ttk.Button(self.modulFrame,text="Modul starten", command=self.startModule)
         self.tsB.grid(column=5,row=5,sticky=E)

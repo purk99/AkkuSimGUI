@@ -37,7 +37,7 @@ class SensorRead(ttk.Frame):
         #I2C Ende
 
         self.maxExpCurr = 10
-        self.shuntResValue = 0.01
+        self.shuntResValue = 0.00475
 
         self.voltBat = float(10)
         self.voltCell = float(10)
@@ -119,7 +119,7 @@ class SensorRead(ttk.Frame):
         self.ina226.i2c_close(h)
         return regVal
 
-    def ina226_writeReg(self,adress,content = int16):
+    def ina226_writeReg(self,adress,content = uint16):
         h = self.ina226.i2c_open(1,self.ina226_adress)
         test = [content >> 8, content & 0xff]
         self.ina226.i2c_write_i2c_block_data(h,adress,test)
@@ -128,7 +128,9 @@ class SensorRead(ttk.Frame):
     #eventuell currentLSB fest berechnen, wenn mit 20A gerechnet wird
     def ina226_calibrateReg(self, maxExpectCurr = uint16,rShunt = float16):
         self.currentLSB = maxExpectCurr/(2**15)
+        #self.currentLSB = 0.5e-3
         self.cal = uint16(0.00512/(self.currentLSB*rShunt))
+        #self.cal = uint16(1707)
         self.ina226_writeReg(self.ina226_cal_reg,self.cal)
 
     def readCalibrationValuesFromCSV(self):
@@ -143,15 +145,18 @@ class SensorRead(ttk.Frame):
 
     #kann zu testzwecken ausgelesen werden
     def ina226_getShuntVoltage(self):
-        shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6) + (self.shuntVoltOffset))
+        shuntVolt = float((int16(self.ina226_readReg(self.ina226_shunt_reg)) * 2.5e-3)/2 + (self.shuntVoltOffset))
         return round(shuntVolt,4)
 
     def ina226_getBusVoltage(self):
-        busVolt = float(self.ina226_readReg(self.ina226_bus_reg) * 1.25e-3 + self.busVoltOffset)
+        busVolt = float((self.ina226_readReg(self.ina226_bus_reg) * 1.25e-3) + self.busVoltOffset)
         return round(busVolt,2)
 
     def ina226_getCurr(self):
-        busCurr = float(self.ina226_readReg(self.ina226_curr_reg)*self.currentLSB + self.busCurrOffset)
+        busCurr = float((int16(self.ina226_readReg(self.ina226_curr_reg))*self.currentLSB) + self.busCurrOffset)
+        #busCurr = float((int16(self.ina226_readReg(self.ina226_curr_reg))*0.5e-3) + self.busCurrOffset)
+        #busCurr = float(((self.ina226_readReg(self.ina226_curr_reg))*self.currentLSB) + self.busCurrOffset)
+        
         return round(busCurr,2)
 
     def ina226_getPower(self):
@@ -178,6 +183,12 @@ class SensorRead(ttk.Frame):
 
     def ina226_setBusPowerOffset(self,offset):
         self.powerOffset = offset
+
+    def ina226_setMaxExpCurr(self,value):
+        self.maxExpCurr = int(value)
+
+    def ina226_setShuntResValue(self,value):
+        self.shuntResValue = int(value)
     
     def ina226_getShuntOffset(self):
         return self.shuntVoltOffset
@@ -190,6 +201,14 @@ class SensorRead(ttk.Frame):
 
     def ina226_getPowerOffset(self):
         return self.powerOffset
+
+    def ina226_getMaxExpCurr(self):
+        return self.maxExpCurr
+
+    def ina226_getShuntResValue(self):
+        return self.shuntResValue
+    
+
 
 class SensorReadValuesOnly():
     def __init__(self):
@@ -209,7 +228,7 @@ class SensorReadValuesOnly():
         #I2C Ende
 
         self.maxExpCurr = 10
-        self.shuntResValue = 0.01
+        self.shuntResValue = 0.00475
 
         self.voltBat = float(10)
         self.voltCell = float(10)

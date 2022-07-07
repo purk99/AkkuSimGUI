@@ -102,14 +102,15 @@ EepromDataCycle = [ EepromDataDict["numCCstart1"],
                     EepromDataDict["numCVstop2"]
                 ]
 
-EepromDataValues = list(range(255))
+EepromDataValues = list(range(256))
 CalibrationFine = list(arange(0,1,0.1))
 CalibrationCoarse = list(range(0,6))
 
 #Setup of Temprature Data of NTC
 file = open("/home/festool/Documents/AkkuSimGUI/NTCValues.CSV") 
 arr = loadtxt(file,delimiter=';')
-#print(arr[0,0])
+
+#values are set below
 NTCTempValues = [None] * 116
 NTCTemps = [None] * 116
 for p in range(size(arr,0)):

@@ -394,7 +394,7 @@ class Countdown(ttk.Frame):
 class EepromControl():
     def __init__(self):
         #super().__init__()
-        self.setEeprom()
+        #self.setEeprom()
         self.sendBuffer = bytearray(5)
         self.receiveBuffer = bytearray(3)
         self.ser = serial.Serial("/dev/ttyAMA0", 9600)

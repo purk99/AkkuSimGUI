@@ -26,7 +26,6 @@ uartCMD = {
     "setEepromToSmallState" :   0x09
 }
 
-###Startwerte für alle Listen###
 ###Values, that are neccessary or appear more than once
 EepromDataDict = {
     "safetyB1"      : 0x93,

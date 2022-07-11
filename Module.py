@@ -1,7 +1,7 @@
 from re import T
 from tkinter import ttk
 from tkinter import *
-#from moduleEeprom import *
+from moduleEeprom import *
 
 from moduleSpannung import *
 from moduleEeprom import *

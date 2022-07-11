@@ -10,6 +10,7 @@ import pigpio
 from tkinter import ttk
 from tkinter import *
 #from tools_V21 import Countdown
+from moduleEeprom import ModulEepromKomplett
 
 '''
 
@@ -40,7 +41,6 @@ f.close()
 
 #neuer Kommentar
 
-'''
 
 class Countdown(ttk.Frame):
     def __init__(self,parent,duration):
@@ -93,7 +93,6 @@ class Countdown(ttk.Frame):
         return self.dur
     def getStartDur(self):
         return self.durStart
-'''
 
 root = Tk()
 
@@ -104,14 +103,14 @@ left = Label(labelframe, text="Inside the LabelFrame")
 left.pack()
 '''
 
+
 root = Tk()
 root.geometry("800x480")
 
 frame = ttk.Frame(root)
 frame.grid()
 
-cd = Countdown(frame,10)
-ttk.Button(frame,text="start",command=cd.countdown).grid(column=5,row=5)
+eeprom = ModulEepromKomplett(frame)
 
 root.mainloop()
 

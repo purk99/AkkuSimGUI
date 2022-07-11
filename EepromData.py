@@ -65,7 +65,7 @@ InfoDataDict = {
 #bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
 #in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
 #Indizierung prüfen
-EepromDataComplete = [1] * 256
+EepromDataComplete = [1] * 150
 
 #contains data for ntc(0) and ov(1)
 InfoData = [InfoDataDict["NTCvalue"],
@@ -107,7 +107,8 @@ CalibrationFine = list(arange(0,1,0.1))
 CalibrationCoarse = list(range(0,6))
 
 #Setup of Temprature Data of NTC
-file = open("/home/festool/Documents/AkkuSimGUI/NTCValues.CSV") 
+#file = open("/home/festool/Documents/AkkuSimGUI/NTCValues.CSV") 
+file = open("NTCValues.CSV") 
 arr = loadtxt(file,delimiter=';')
 
 #values are set below

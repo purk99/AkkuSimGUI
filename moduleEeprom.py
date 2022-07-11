@@ -3,47 +3,159 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import font
 
+import numpy
+
 from tools_V21 import *
 from EepromData import *
 from EepromAccess import *
+import csv
+from os.path import exists
 
 class ModulEepromKomplett(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
 
+        self.eeprom = EepromControl()
+        self.eeprom.setEeprom()
+
         self.grid()
 
         headlabel = ttk.Label(self,text="EEPROM-Daten", font='20')
-        headlabel.grid(column=1,row=0)
+        headlabel.grid(column=0,row=0, columnspan=4)
 
         counter = 0
         counter1 = 1
-        self.regPointer = [None] * 128
-        self.regValue = [None] * 128
-        fields = list(range(129))
-        for i in fields:
-            ttk.Label(self, text=hex(fields[i])).grid(column=counter*2,row=counter1,pady=2,sticky=E)
-            self.regValue[i] = ttk.Label(self,text=hex(EepromDataComplete[i]))
-            self.regValue.grid(column=(counter*2)+1,row=counter1,pady=2,sticky=W)
+
+        self.valueF = [ttk.Label] * 150
+        self.lfF = [ttk.Labelframe] * 150
+
+        self.regChangeF = ttk.Labelframe(self,text="Registerwert ändern")
+        self.regChangeF.grid(column=0,row=3, padx=3,pady=3,sticky=NSEW)
+
+        self.paramFileF = ttk.Frame(self)
+        self.paramFileF.grid(column=1,row=3,padx=3,pady=3,sticky=W)
+
+        self.modulcanvas = Canvas(self, width=800, height=225,borderwidth=0)
+        self.modulcanvas.grid(column=0,row=1, columnspan=4)
+
+        self.modulframe = ttk.Frame(self.modulcanvas)
+        #self.modulframe.grid(column=0,row=1) 
+
+        self.modulcanvas.create_window(0,0,anchor=NW, window=self.modulframe, tags="self.frame")
+        self.modulframe.bind("<Configure>", self.onFrameConfigure)
+
+        self.sb = ttk.Scrollbar(self, orient=HORIZONTAL)
+        self.sb.grid(column=0,row=2, columnspan=4, sticky=EW)  
+
+        self.modulcanvas.config(xscrollcommand=self.sb.set)
+        self.sb.config(command=self.modulcanvas.xview)   
+        self.modulcanvas.configure(scrollregion=self.modulcanvas.bbox("all"))
+        
+
+        for p in range(150):
+            indexString = "Pos: {}".format(p)
+            self.lfF[p] = ttk.Labelframe(self.modulframe,text=indexString)
+            self.lfF[p].grid(column=counter,row=counter1,padx=1)
+
             counter1 += 1
-            if fields[i]%10 == 9:
+            if counter1%7 == 0:
                 counter += 1
                 counter1 = 1
+                
+        
+        for i in range(150):            
+            self.valueF[i] = ttk.Label(self.lfF[i],text=hex(EepromDataComplete[i]))
+            self.valueF[i].grid(column=1,row=0, sticky=EW)
 
-        ttk.Label(self,text="Register wählen").grid(column=0,row=12)
+        ###Single Register Changes Begin
+        ttk.Label(self.regChangeF,text="Register wählen").grid(column=0,row=0)
 
-        self.regCombo = ttk.Combobox(self,values=hex(list(range(129))))
-        self.regCombo.grid(column=1,row=12)
+        self.regCombo = ttk.Combobox(self.regChangeF,values=(list(range(150))))
+        self.regCombo.grid(column=0,row=1)
 
-        self.regValCombo = ttk.Combobox(self,values=hex(list(range(129))))
-        self.regValCombo.grid(column=2,row=12)
+        ttk.Label(self.regChangeF,text="Wert wählen").grid(column=1,row=0)
 
-        self.parChB = ttk.Button(self,text="Parameter ändern")
-        self.parChB.grid(column=3,row=12)
+        self.regValCombo = ttk.Combobox(self.regChangeF,values=(list(range(256))))
+        self.regValCombo.grid(column=1,row=1)
 
-    def updateRegValue(self,reg,val):
-        EepromDataComplete[reg] = val
-        self.regValue[reg].configure(text=EepromDataComplete[reg])
+        self.parChB = ttk.Button(self.regChangeF,text="Parameter ändern",command=self.updateRegValue)
+        self.parChB.grid(column=2,row=1)
+
+        self.resB = ttk.Button(self.regChangeF,text="Auf Standardwerte zurücksetzen", command=self.eeprom.setEeprom)
+        self.resB.grid(column=0,row=2,columnspan=2,sticky=EW)
+
+        ###Parameter File Load/Save Begin
+        paramSave = ttk.Labelframe(self.paramFileF,text="Neue Datei erzeugen",padding=5)
+        paramSave.grid(column=0,row=0, sticky=EW)
+        self.fileName = ttk.Entry(paramSave)
+        self.fileName.grid(column=0,row=0)
+        ttk.Button(paramSave,text="aktuellen Parametersatz speichern",command=self.createNewParamFile).grid(column=1,row=0)
+
+        paramLoad = ttk.Labelframe(self.paramFileF,text="Alte Datei laden", padding=5)
+        paramLoad.grid(column=0,row=1, sticky=EW)
+        ttk.Label(paramLoad,text="Groß-/Kleinschreibung beachten\nNur Dateinamen angeben!").grid(column=0,row=0)
+        self.fileLoadName = ttk.Entry(paramLoad)
+        self.fileLoadName.grid(column=1,row=1)
+        ttk.Button(paramLoad,text="Vorhandenen Parametersatz Laden",command=self.loadParamFile).grid(column=0,row=1)        ###Parameter Load/Save End
+
+    def createNewParamFile(self):
+
+        f = open("./Parametersätze/{}".format(self.fileName.get()),'w')
+        writer = csv.writer(f)
+        writer.writerow(EepromDataComplete)
+        f.close()
+
+        infoF = ttk.Frame(self,padding=20,relief='ridge')
+        infoF.grid(column=0,row=1,sticky=N ,columnspan=10,rowspan=10)
+
+        infoT = ttk.Label(infoF,text="Neue Datei erzeugt,\nbitte bestätigen",font=15)
+        infoT.grid(column=1,row=0)
+
+        infoExitB = ttk.Button(infoF,text="Bestätigen",command=infoF.destroy)
+        infoExitB.grid(column=1,row=1)
+
+    def loadParamFile(self):
+        #if exists(int("./Parametersätze/{}".format(int(self.fileLoadName.get())))) == True:
+        if exists(("./Parametersätze/{}".format((self.fileLoadName.get())))) == True:
+            file = open("./Parametersätze/{}".format((self.fileLoadName.get())))
+            arr = numpy.loadtxt(file,delimiter=',')
+
+            for p in range(size(EepromDataComplete)):
+                EepromDataComplete[p] = arr[p]
+                self.valueF[p].configure(text=EepromDataComplete[p])
+
+            #sendeBefehl an Arduino fehlt noch
+
+            infoF = ttk.Frame(self,padding=20,relief='ridge')
+            infoF.grid(column=0,row=1,sticky=N ,columnspan=10,rowspan=10)
+
+            infoT = ttk.Label(infoF,text="Parameter geladen,\nDaten Auf Arduino übertragen,\nbitte bestätigen",font=15)
+            infoT.grid(column=1,row=0)
+
+            infoExitB = ttk.Button(infoF,text="Bestätigen",command=infoF.destroy)
+            infoExitB.grid(column=1,row=1)
+        else:
+            infoF = ttk.Frame(self,padding=20,relief='ridge')
+            infoF.grid(column=0,row=1,sticky=N ,columnspan=10,rowspan=10)
+
+            infoT = ttk.Label(infoF,text="Datei nicht vorhanden\noder Pfad falsch!\nbitte bestätigen",font=15)
+            infoT.grid(column=1,row=0)
+
+            infoExitB = ttk.Button(infoF,text="Bestätigen",command=infoF.destroy)
+            infoExitB.grid(column=1,row=1)
+
+    def onFrameConfigure(self,event):
+        self.modulcanvas.configure(scrollregion=self.modulcanvas.bbox("all"))
+
+    def updateRegValue(self):
+        #change Eeprom-Value on Raspberry side
+        EepromDataComplete[int(self.regCombo.get())] = int(self.regValCombo.get())
+        #Update GUI
+        self.valueF[int(self.regCombo.get())].configure(text=EepromDataComplete[int(self.regCombo.get())])
+        #change EEPROM-Value on Arduino
+        self.eeprom.writeSingleRegister(int(self.regCombo.get()), int(self.regValCombo.get()))
+    
+
 
 
 

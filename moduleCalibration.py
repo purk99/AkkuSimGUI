@@ -95,7 +95,7 @@ class ModulKalibirerungAllgemein(ttk.Frame):
 
     def saveCalValuesToCSV(self):
 
-        f = open('calibVals.CSV','w')
+        f = open('calibVals.CSV','wb')
         writer = csv.writer(f)
         writer.writerow(self.calibVals)
         f.close()

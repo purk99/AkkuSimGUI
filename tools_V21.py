@@ -11,8 +11,8 @@ import numpy
 from EepromData import *
 from pigpio import *
 
-START_BIT = 0x02
-STOP_BIT = 0x03
+START_BIT = 2
+STOP_BIT = 3
 
 #neuer Kommentar
 
@@ -208,8 +208,6 @@ class SensorRead(ttk.Frame):
     def ina226_getShuntResValue(self):
         return self.shuntResValue
     
-
-
 class SensorReadValuesOnly():
     def __init__(self):
         self.ina226_adress = 0x40
@@ -339,8 +337,7 @@ class SensorReadValuesOnly():
 
     def ina226_getShuntResValue(self):
         return self.shuntResValue
-
-                
+           
 class Countdown(ttk.Frame):
     def __init__(self,parent,duration):
         ttk.Frame.__init__(self, parent)
@@ -409,10 +406,11 @@ class EepromControl():
 
     def receivePackage(self):
         self.receiveBuffer = self.ser.read(3)
-        
+
         payload = (self.receiveBuffer[1])
-        if self.receiveBuffer[0] == START_BIT & self.receiveBuffer[2] == STOP_BIT:
+        if ((self.receiveBuffer[0] == START_BIT) & (self.receiveBuffer[2] == STOP_BIT)):
             return uint8(payload)
+
 
     def readSingleRegister(self,adress):
         self.sendPackage(uartCMD["eepromReadSingleReg"], adress, 1)
@@ -420,8 +418,11 @@ class EepromControl():
 
     #unbenutzte Funktion        
     def readAllRegisters(self):
-        for i in range(256):
+        EepromBuffer = [uint8(0)] * 150
+        for i in range(150):
+            #EepromBuffer[i] = self.readSingleRegister(i)
             EepromDataComplete[i] = self.readSingleRegister(i)
+        #return EepromBuffer
 
     def writeSingleRegister(self,adress,content):
         self.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)
@@ -446,7 +447,41 @@ class EepromControl():
     def setOvValue(self,value):
         InfoData[1] = value
 
+    def getArduinoEepromAndInfoData(self):
+        #reads Register Values from Arduino and saves them into EepromActualParams
+        ardEepromData = self.readAllRegisters()
+        #read Info Values and save them into infoActualParams.py
+        ardInfoData = [self.readNTC(),self.readOverVoltage()]
+
+        print(ardEepromData)
+        print(ardInfoData)
+
+        f = open('./EEPROMPARAMS/EepromActualParams.CSV','w')
+        writer = csv.writer(f)
+        writer.writerow(ardEepromData)
+        f.close()
+
+        g = open('./EEPROMPARAMS/InfoActualParams.CSV','w')
+        writer = csv.writer(g)
+        writer.writerow(ardInfoData)
+        g.close()
+
     def setEeprom(self):
+        #reads all Registers from CSV files and feeds them into 
+        #Raspberry-Sided EEPROM-Register
+        #--> Synchronization of EEPROM-simulating-Arrays on Arduino and Raspberry Pi
+        f = open('./EEPROMPARAMS/EepromActualParams.CSV')
+        arr = numpy.loadtxt(f,delimiter=',')
+
+        for p in range(size(arr)):
+            EepromDataComplete[p] = arr[p]
+
+        g = open('./EEPROMPARAMS/InfoActualParams.CSV')
+        arr = numpy.loadtxt(g,delimiter=',')
+
+        for p in range(size(arr)):
+            InfoData[p] = arr[p]
+        '''
         #Akkupack Infos 1/3
         EepromDataComplete[0] = EepromDataDict["safetyB1"]
         EepromDataComplete[1] = EepromDataDict["safetyB2"]
@@ -524,7 +559,7 @@ class EepromControl():
         #--> 0x0F = on;
         #default off
         EepromDataComplete[119] = 0xF0
-        
+        '''        
 
 #Ermöglicht Konvertieren von EEPROM Werten in auslesbare Werte
 class HexValConvert():

@@ -10,6 +10,7 @@ from time import sleep
 
 from moduleSpannung import *
 from Module import *
+from moduleCalibration import ModulStartKalibrierung
 
 class root(tk.Tk):
     def __init__(self):
@@ -21,9 +22,9 @@ class root(tk.Tk):
 
         mainframe = ttk.Frame(self, padding= 10, relief="ridge", borderwidth=5)
         mainframe.pack(fill="both", expand="yes")
-        #mainframe.grid(sticky=NSEW)
-        #mainframe.columnconfigure(0, weight=1)
-        #mainframe.rowconfigure(0, weight=1)
+        
+        checkFrame = ttk.Frame(self)
+        checkFrame.pack(anchor=N)
 
         headLabel = ttk.Label(mainframe,text="Akkuprüfeinheit V2", font=('bold','40'))
         headLabel.pack()
@@ -32,6 +33,9 @@ class root(tk.Tk):
         #label.grid(row=0)
         label.pack()
 
+        startTest   = ttk.Button(mainframe,text="\tRegisterwerte Prüfen\nNach jedem Neustart durchführen!",padding=10,width=75, command=self.openWindowRegisterCheck)
+        startTest.pack(pady=5)
+
         voltageTest = ttk.Button(mainframe,text="Testmodul Spannung",padding=10,width=75,command = self.openWindowSpannung)
         #voltageTest.grid(row=3,pady=5)
         voltageTest.pack(pady=5)
@@ -39,9 +43,6 @@ class root(tk.Tk):
         eepromTest  = ttk.Button(mainframe,text="Testmodul EEPROM",padding=10,width=75, command=self.openWindowEeprom)
         #eepromTest.grid(row=4,pady=5)
         eepromTest.pack(pady=5)
-
-        #stromTest   = ttk.Button(mainframe,text="Testmodus Ladestrom",padding=10,width=75)
-        #stromTest.grid(column=1,row=5,pady=5)
 
         temperaturTest = ttk.Button(mainframe,text="Testmodul Temperatur",padding=10,width=75, command=self.openWindowTemp)
         #temperaturTest.grid(row=6,pady=5)
@@ -57,14 +58,9 @@ class root(tk.Tk):
         #button = ttk.Button(mainframe, text = "nächstes Fenster öffnen",command = self.openNewWindow)
         #button.grid(column=1,row=1)
 
-        
-
         eb = ttk.Button(mainframe,text="Programm Beenden",command = self.destroy) 
         #eb.grid(row=10)
         eb.pack(pady=5)
-
-        #self.pack(fill="both", expand="yes")
-
 
     def openWindowSpannung(self):
         ModulSpannung() 
@@ -72,8 +68,8 @@ class root(tk.Tk):
     def openWindowEeprom(self):
         ModulEeprom()
 
-    def openWindowLadestrom(self):
-        pass
+    def openWindowRegisterCheck(self):
+        ModulStartKalibrierung()
 
     def openWindowTemp(self):
         ModulTemperatur()

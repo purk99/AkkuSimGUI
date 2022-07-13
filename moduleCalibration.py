@@ -3,6 +3,7 @@ from tkinter import *
 
 from EepromData import *
 from tools_V21 import *
+from moduleEeprom import ModulEepromKomplett
 import csv
 import numpy
 
@@ -102,8 +103,8 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         
 
     def readCalValuesFromCSV(self):
-        file = open('calibVals.CSV')
-        arr = numpy.loadtxt(file, delimiter=',')
+        f = open('calibVals.CSV')
+        arr = numpy.loadtxt(f, delimiter=',')
         
         for p in range(size(arr)):
             self.calibVals[p] = arr[p]
@@ -119,6 +120,66 @@ class ModulKalibirerungAllgemein(ttk.Frame):
         self.currCalL.configure(text=self.meas.ina226_getBusCurrOffset())
         self.powCalL.configure(text=self.meas.ina226_getPowerOffset())
             
+class ModulStartKalibrierung(Toplevel):
+    def __init__(self,master = None):
+        super().__init__(master = master)
+        self.attributes('-fullscreen', True)
+        #self.grid()
+
+        ttk.Label(self,text="EEPROM-Register und Infos prüfen!",font='20').grid(column=0,row=0,columnspan=10)
+
+        eeprom = EepromControl()
+        #eeprom.getArduinoEepromAndInfoData()
+        eeprom.readAllRegisters()
+        #eeprom.setEeprom()
+
+        counter = 0
+        counter1 = 1
+
+        self.valueF = [ttk.Label] * 150
+        self.lfF = [ttk.Labelframe] * 150
+
+        #self.regChangeF = ttk.Labelframe(self,text="Registerwert ändern")
+        #self.regChangeF.grid(column=0,row=3, padx=3,pady=3,sticky=NSEW)
+
+        #self.paramFileF = ttk.Frame(self)
+        #self.paramFileF.grid(column=1,row=3,padx=3,pady=3,sticky=W)
+
+        self.modulcanvas = Canvas(self, width=800, height=225,borderwidth=0)
+        self.modulcanvas.grid(column=0,row=1, columnspan=4)
+
+        self.modulframe = ttk.Frame(self.modulcanvas)
+        #self.modulframe.grid(column=0,row=1) 
+
+        self.modulcanvas.create_window(0,0,anchor=NW, window=self.modulframe, tags="self.frame")
+        self.modulframe.bind("<Configure>", self.onFrameConfigure)
+
+        self.sb = ttk.Scrollbar(self, orient=HORIZONTAL)
+        self.sb.grid(column=0,row=2, columnspan=4, sticky=EW)  
+
+        self.modulcanvas.config(xscrollcommand=self.sb.set)
+        self.sb.config(command=self.modulcanvas.xview)   
+        self.modulcanvas.configure(scrollregion=self.modulcanvas.bbox("all"))
+        
+
+        for p in range(150):
+            indexString = "Pos: {}".format(p)
+            self.lfF[p] = ttk.Labelframe(self.modulframe,text=indexString)
+            self.lfF[p].grid(column=counter,row=counter1,padx=1)
+
+            counter1 += 1
+            if counter1%7 == 0:
+                counter += 1
+                counter1 = 1
+                
+        
+        for i in range(150):            
+            self.valueF[i] = ttk.Label(self.lfF[i],text=hex(EepromDataComplete[i]))
+            self.valueF[i].grid(column=1,row=0, sticky=EW)
+
+    def onFrameConfigure(self,event):
+        self.modulcanvas.configure(scrollregion=self.modulcanvas.bbox("all"))
+
 
 
 

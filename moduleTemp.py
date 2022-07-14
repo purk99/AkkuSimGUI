@@ -17,21 +17,17 @@ class ModulTempNTCError(ttk.Frame):
         self.modulframe = ttk.Frame(self)
         self.modulframe.grid(column=1,row=1)
 
-        #erst auf Raspbi aktivieren, sonst Error
         self.comm = EepromControl()
-        self.comm.setEeprom()
-
-        #self.meas = SensorRead(self.modulframe)
-        #self.meas.grid(column=1,row=1)        
+        self.comm.setEeprom()   
 
         self.shortB = ttk.Button(self.modulframe,text="NTC kurzschließen",command=self.shortNTC)
-        self.shortB.grid(column=0,row=1)
+        self.shortB.grid(column=0,row=1, sticky=EW)
 
         self.discB = ttk.Button(self.modulframe,text="NTC ausstecken", command=self.discNTC)
         self.discB.grid(column=0,row=2, sticky=EW)
 
         self.infoL = ttk.Label(self.modulframe,text="NTC Normalzustand", font='20')
-        self.infoL.grid(column=0,row=4)
+        self.infoL.grid(column=0,row=4, sticky=EW)
 
         #eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
         #eb.grid(column=1,row=10)        

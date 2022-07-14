@@ -19,20 +19,20 @@ class ModulSpannung(Toplevel):
         eeprom = EepromControl()
         eeprom.setEeprom()
         
-        self.modulframe = ttk.Frame(self, relief='ridge')
-        self.modulframe.grid(column=0,row=1,padx=3,pady=3, ipadx=3, ipady=3)
+        self.modulframe = ttk.Frame(self)
+        self.modulframe.grid(column=0,row=1,padx=3,pady=3, ipadx=3, ipady=3, columnspan=2)
 
-        label2 = ttk.Label(self,text="Testmodul Spannung", font='30',padding=5)
-        label2.grid(column=0,row=0)
+        label2 = ttk.Label(self,text="Testmodul Spannung", font='30')
+        label2.grid(column=1,row=0)
         
         self.meas = SensorRead(self.modulframe)
         self.meas.grid(column=1,row=0, ipady=3)
 
         self.vDisCh = ModulSpannungTEntladung(self.modulframe)
-        self.vDisCh.grid(column=0,row=0,ipady=3)
+        self.vDisCh.grid(column=0,row=0,ipady=3, sticky=EW)
 
         self.oV = ModulSpannungUeIm(self.modulframe)
-        self.oV.grid(column=0,row=1)        
+        self.oV.grid(column=0,row=1, sticky=NSEW)        
 
         eb = ttk.Button(self,text="Fenster schließen",command=self.destroy)
         eb.grid(column=0,row=5, ipadx=5, ipady=5 , sticky=E)
@@ -42,39 +42,11 @@ class ModulEeprom(Toplevel):
         super().__init__(master = master)
         self.attributes('-fullscreen',True)
 
-        self.eeprom = EepromControl()
-        self.eeprom.setEeprom()
-
-        self.grid()
-
-        counter = 0
-        counter1 = 1
-
-        valueF = [ttk.Label] * 135
-        lfF = [ttk.Labelframe] * 135
-
-        self.modulframe = ttk.Frame(self, padding=10)
-        self.modulframe.grid(column=0,row=1)
-
-        headLabel = ttk.Label(self, text="EEPROM Daten",font='15')
-        headLabel.grid(column=0,row=0)
-
-        for p in range(135):
-            indexString = "Pos: {}".format(p)
-            lfF[p] = ttk.Labelframe(self.modulframe,text=indexString)
-            lfF[p].grid(column=counter,row=counter1,padx=1)
-
-            counter1 += 1
-            if p%10 == 9:
-                counter += 1
-                counter1 = 1
-        
-        for i in range(135):            
-            valueF[i] = ttk.Label(lfF[i],text=hex(EepromDataComplete[i]))
-            valueF[i].grid(column=1,row=0, sticky=EW)
+        self.eepromComplete = ModulEepromKomplett(self)
+        self.eepromComplete.grid(column=0,row=0)
 
         eb = ttk.Button(self,text="Fenster schließen",command=self.destroy)
-        eb.grid(column=10,row=10)
+        eb.grid(column=0,row=1,sticky=W)
 
 class ModulTemperatur(Toplevel):
     def __init__(self,master=None):
@@ -87,7 +59,7 @@ class ModulTemperatur(Toplevel):
         self.chargePar.grid(column=0,row=2,sticky=S)
         
         self.meas = SensorRead(self)
-        self.meas.grid(column=1,row=1,padx=5)
+        self.meas.grid(column=1,row=1,padx=3, sticky=N)
         
         self.ntc = ModulTempNTCError(self)
         self.ntc.grid(column=1,row=2,sticky=NSEW)
@@ -128,7 +100,7 @@ class ModulTemperatur(Toplevel):
         self.newTempB = ttk.Button(self.valF,text="Temperatur einstellen",command=self.setManualTemp)
         self.newTempB.grid(column=1,row=9)
 
-        self.tempAktuell = self.eeprom.readNTC()
+        self.tempAktuell = InfoData[0]
         ttk.Label(self.valF,text="Aktuelle Temperatur",font='15').grid(column=0,row=10)
         self.tAL = ttk.Label(self.valF,text=self.tempAktuell,font='15')
         self.tAL.grid(column=1,row=10)
@@ -138,7 +110,7 @@ class ModulTemperatur(Toplevel):
         #self.tSL.grid(column=1,row=11)
 
         eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
-        eb.grid(column=1,row=10)
+        eb.grid(column=1,row=10, sticky=E)
 
     def checkTestStatus(self):
         if self.meas.ina226_getCurrBat() == 0:

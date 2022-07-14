@@ -55,9 +55,9 @@ class SensorRead(ttk.Frame):
 
         ttk.Frame.__init__(self, parent)
         
-        self.grid(sticky=NSEW)
+        self.grid()
 
-        sensFrame = ttk.Frame(self,relief='ridge')
+        sensFrame = ttk.Labelframe(self,text="Messwerte")
         sensFrame.grid(padx=3, pady=3, sticky=NSEW)
 
         vbl = ttk.Label(sensFrame, text="Spannung Batterie", font=20)
@@ -85,7 +85,7 @@ class SensorRead(ttk.Frame):
         self.shuntVoltL.grid(column=1,row=4,padx=5)
 
         startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.checkMeas)
-        startMeasB.grid(column=0,row=5, pady=2, sticky=EW)
+        startMeasB.grid(column=0,row=5, pady=2, sticky=EW, columnspan=2)
 
         #calB = ttk.Button(sensFrame,text="Neukalibrierung",command=self.calib)
         #calB.grid(column=0,row=5)
@@ -416,13 +416,12 @@ class EepromControl():
         self.sendPackage(uartCMD["eepromReadSingleReg"], adress, 1)
         return self.receivePackage()
 
-    #unbenutzte Funktion        
     def readAllRegisters(self):
         EepromBuffer = [uint8(0)] * 150
         for i in range(150):
-            #EepromBuffer[i] = self.readSingleRegister(i)
-            EepromDataComplete[i] = self.readSingleRegister(i)
-        #return EepromBuffer
+            EepromBuffer[i] = self.readSingleRegister(i)
+            #EepromDataComplete[i] = self.readSingleRegister(i)
+        return EepromBuffer
 
     def writeSingleRegister(self,adress,content):
         self.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)
@@ -453,9 +452,6 @@ class EepromControl():
         #read Info Values and save them into infoActualParams.py
         ardInfoData = [self.readNTC(),self.readOverVoltage()]
 
-        print(ardEepromData)
-        print(ardInfoData)
-
         f = open('./EEPROMPARAMS/EepromActualParams.CSV','w')
         writer = csv.writer(f)
         writer.writerow(ardEepromData)
@@ -468,98 +464,19 @@ class EepromControl():
 
     def setEeprom(self):
         #reads all Registers from CSV files and feeds them into 
-        #Raspberry-Sided EEPROM-Register
+        #Raspberry-Sided EEPROM-Register and Info-Register
         #--> Synchronization of EEPROM-simulating-Arrays on Arduino and Raspberry Pi
         f = open('./EEPROMPARAMS/EepromActualParams.CSV')
         arr = numpy.loadtxt(f,delimiter=',')
 
         for p in range(size(arr)):
-            EepromDataComplete[p] = arr[p]
+            EepromDataComplete[p] = int(arr[p])
 
         g = open('./EEPROMPARAMS/InfoActualParams.CSV')
         arr = numpy.loadtxt(g,delimiter=',')
 
         for p in range(size(arr)):
-            InfoData[p] = arr[p]
-        '''
-        #Akkupack Infos 1/3
-        EepromDataComplete[0] = EepromDataDict["safetyB1"]
-        EepromDataComplete[1] = EepromDataDict["safetyB2"]
-        EepromDataComplete[2] = EepromDataDict["cellsInSer"]    #number of cells in Series
-        EepromDataComplete[3] = EepromDataDict["U_min"]         #U_min
-        EepromDataComplete[4] = 0x18                            #T_max
-        EepromDataComplete[5] = 0x80                            #not specified
-        EepromDataComplete[6] = 0xD4                            #calibration value
-        EepromDataComplete[7] = 0xC0                             #calibration value
-        EepromDataComplete[8] = EepromDataDict["capBat"]                              #C_batt
-        EepromDataComplete[9] = EepromDataDict["U_charge"]                             #U_charge
-
-        EepromDataComplete[10] = 1;                             #min temp(not specified)
-        EepromDataComplete[11] = 1;                             #max temp(not specified)
-
-        EepromDataComplete[12] = 242                           #Detection of Eeprom Assignment
-        EepromDataComplete[13] = EepromDataDict["CellsInPar"]  #number of cells in Parallel
-        EepromDataComplete[14] = EepromDataDict["numCCstart1"] #charging operations values start
-        EepromDataComplete[15] = EepromDataDict["numCCstart2"]
-        EepromDataComplete[16] = EepromDataDict["numCVstart1"]
-        EepromDataComplete[17] = EepromDataDict["numCVstart2"]
-        EepromDataComplete[18] = EepromDataDict["numCVstop1"]
-        EepromDataComplete[19] = EepromDataDict["numCVstop2"]  #charging operations stop
-
-        EepromDataComplete[20] = 0x1E                          #Value w/o function
-        EepromDataComplete[21] = 0x43                          #Value w/p function
-        EepromDataComplete[22] = EepromDataDict["U_charge"]                           #U_charge
-
-        EepromDataComplete[23] = 0xE7                          #Value w/o function
-
-        #Registers 24 - 27 are 0 by default
-        EepromDataComplete[28] = 200
-        EepromDataComplete[29] = 106
-        EepromDataComplete[30] = 11      
-        EepromDataComplete[31] = 152
-
-        EepromDataComplete[32] = 0xE0                          #Value w/o function or address to activate check capacity gauge
-
-        #Akkupack Infos 2/3
-        EepromDataComplete[33] = EepromDataDict["safetyB1"]
-        EepromDataComplete[34] = EepromDataDict["safetyB2"]
-        EepromDataComplete[35] = EepromDataDict["numStartChaSub30Deg1"]         #Number of start charging              H Byte
-        EepromDataComplete[36] = EepromDataDict["numStartChaSub30Deg2"]         #operations with temperature <30°C     L Byte
-        EepromDataComplete[37] = EepromDataDict["U_charge"]                          #U_charge
-        EepromDataComplete[38] = EepromDataDict["min_temp"]                          #min ever reached BatPAck Temp
-        EepromDataComplete[39] = EepromDataDict["max_temp"]                          #max ever reached BatPack Temp
-        EepromDataComplete[40] = EepromDataDict["U_charge"]                          #U_charge
-        EepromDataComplete[41] = 0                            #Battery Pack manufacturer
-
-        EepromDataComplete[42] = 0                            #charging operations start
-        EepromDataComplete[43] = 1
-        EepromDataComplete[44] = 0
-        EepromDataComplete[45] = 1
-        EepromDataComplete[46] = 0
-        EepromDataComplete[47] = 1                             #charging operations stop
-
-        EepromDataComplete[48] = 0                             #supplier of cells
-        EepromDataComplete[49] = 0                             #designation of cell
-
-        EepromDataComplete[108] = EepromDataDict["T_min"]
-        EepromDataComplete[109] = EepromDataDict["T_cold"]
-        EepromDataComplete[110] = EepromDataDict["T_warm"]
-        EepromDataComplete[111] = EepromDataDict["T_max"]
-        EepromDataComplete[112] = EepromDataDict["U_cold"]
-        EepromDataComplete[113] = EepromDataDict["U_warm"]
-        EepromDataComplete[114] = EepromDataDict["U_max"]
-        EepromDataComplete[115] = EepromDataDict["I_cold"]
-        EepromDataComplete[116] = EepromDataDict["I_warm"]
-        EepromDataComplete[117] = EepromDataDict["I_max"]
-
-        #capacity display available(0x0F)/not available(0xF0)
-        EepromDataComplete[118] = 0xF0
-        #variable Ladeparameter 
-        #--> 0xF0 = off
-        #--> 0x0F = on;
-        #default off
-        EepromDataComplete[119] = 0xF0
-        '''        
+            InfoData[p] = int(arr[p])
 
 #Ermöglicht Konvertieren von EEPROM Werten in auslesbare Werte
 class HexValConvert():

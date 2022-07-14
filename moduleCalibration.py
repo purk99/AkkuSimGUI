@@ -126,12 +126,11 @@ class ModulStartKalibrierung(Toplevel):
         self.attributes('-fullscreen', True)
         #self.grid()
 
-        ttk.Label(self,text="EEPROM-Register und Infos prüfen!",font='20').grid(column=0,row=0,columnspan=10)
+        ttk.Label(self,text="Parameter mit Arduino synchronisiert",font='20').grid(column=0,row=0,columnspan=10)
 
         eeprom = EepromControl()
-        #eeprom.getArduinoEepromAndInfoData()
-        eeprom.readAllRegisters()
-        #eeprom.setEeprom()
+        eeprom.getArduinoEepromAndInfoData()
+        eeprom.setEeprom()
 
         counter = 0
         counter1 = 1
@@ -145,17 +144,20 @@ class ModulStartKalibrierung(Toplevel):
         #self.paramFileF = ttk.Frame(self)
         #self.paramFileF.grid(column=1,row=3,padx=3,pady=3,sticky=W)
 
-        self.modulcanvas = Canvas(self, width=800, height=225,borderwidth=0)
-        self.modulcanvas.grid(column=0,row=1, columnspan=4)
+        self.modulcanvas = Canvas(self, width=700, height=400,borderwidth=0)
+        self.modulcanvas.grid(column=0,row=1, columnspan=4, rowspan=2)
 
         self.modulframe = ttk.Frame(self.modulcanvas)
-        #self.modulframe.grid(column=0,row=1) 
+        self.modulframe.grid(column=0,row=0) 
 
         self.modulcanvas.create_window(0,0,anchor=NW, window=self.modulframe, tags="self.frame")
         self.modulframe.bind("<Configure>", self.onFrameConfigure)
 
         self.sb = ttk.Scrollbar(self, orient=HORIZONTAL)
-        self.sb.grid(column=0,row=2, columnspan=4, sticky=EW)  
+        self.sb.grid(column=0,row=3, columnspan=4, sticky=EW)  
+
+        eb = ttk.Button(self,text="Fenster schließen",command=self.destroy)
+        eb.grid(column=0,row=10,sticky=W)
 
         self.modulcanvas.config(xscrollcommand=self.sb.set)
         self.sb.config(command=self.modulcanvas.xview)   
@@ -168,14 +170,28 @@ class ModulStartKalibrierung(Toplevel):
             self.lfF[p].grid(column=counter,row=counter1,padx=1)
 
             counter1 += 1
-            if counter1%7 == 0:
+            if counter1%11 == 0:
                 counter += 1
                 counter1 = 1
                 
         
         for i in range(150):            
-            self.valueF[i] = ttk.Label(self.lfF[i],text=hex(EepromDataComplete[i]))
+            self.valueF[i] = ttk.Label(self.lfF[i],text=hex(int(EepromDataComplete[i])))
             self.valueF[i].grid(column=1,row=0, sticky=EW)
+
+        ntcF = ttk.Labelframe(self,text="NTC-Wert")
+        ntcF.grid(column=5,row=1, sticky=NSEW)
+
+        ntcVal = ttk.Label(ntcF,text=InfoData[0],font='10')
+        ntcVal.grid()
+
+        ovF = ttk.Labelframe(self,text="OV-Wert")
+        ovF.grid(column=5,row=2, sticky=NSEW)
+
+        ovVal = ttk.Label(ovF,text=InfoData[1], font='10')
+        ovVal.grid()
+
+
 
     def onFrameConfigure(self,event):
         self.modulcanvas.configure(scrollregion=self.modulcanvas.bbox("all"))

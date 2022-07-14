@@ -30,13 +30,13 @@ class ModulEepromKomplett(ttk.Frame):
         self.lfF = [ttk.Labelframe] * 150
 
         self.regChangeF = ttk.Labelframe(self,text="Registerwert ändern")
-        self.regChangeF.grid(column=0,row=3, padx=3,pady=3,sticky=NSEW)
+        self.regChangeF.grid(column=0,row=4, padx=3,pady=3,sticky=NSEW)
 
         self.paramFileF = ttk.Frame(self)
-        self.paramFileF.grid(column=1,row=3,padx=3,pady=3,sticky=W)
+        self.paramFileF.grid(column=0,row=3,padx=3,pady=3,sticky=W)
 
-        self.modulcanvas = Canvas(self, width=800, height=225,borderwidth=0)
-        self.modulcanvas.grid(column=0,row=1, columnspan=4)
+        self.modulcanvas = Canvas(self, width=800, height=205,borderwidth=0)
+        self.modulcanvas.grid(column=0,row=1, columnspan=2, sticky=W)
 
         self.modulframe = ttk.Frame(self.modulcanvas)
         #self.modulframe.grid(column=0,row=1) 
@@ -47,24 +47,25 @@ class ModulEepromKomplett(ttk.Frame):
         self.sb = ttk.Scrollbar(self, orient=HORIZONTAL)
         self.sb.grid(column=0,row=2, columnspan=4, sticky=EW)  
 
+        #eb = ttk.Button(self,text="Fenster schließen",command=self.destroy)
+        #eb.grid(column=0,row=5)
+
         self.modulcanvas.config(xscrollcommand=self.sb.set)
         self.sb.config(command=self.modulcanvas.xview)   
         self.modulcanvas.configure(scrollregion=self.modulcanvas.bbox("all"))
         
-
         for p in range(150):
             indexString = "Pos: {}".format(p)
             self.lfF[p] = ttk.Labelframe(self.modulframe,text=indexString)
             self.lfF[p].grid(column=counter,row=counter1,padx=1)
 
             counter1 += 1
-            if counter1%7 == 0:
+            if counter1%6 == 0:
                 counter += 1
                 counter1 = 1
                 
-        
         for i in range(150):            
-            self.valueF[i] = ttk.Label(self.lfF[i],text=hex(EepromDataComplete[i]))
+            self.valueF[i] = ttk.Label(self.lfF[i],text=hex(int(EepromDataComplete[i])))
             self.valueF[i].grid(column=1,row=0, sticky=EW)
 
         ###Single Register Changes Begin
@@ -79,25 +80,25 @@ class ModulEepromKomplett(ttk.Frame):
         self.regValCombo.grid(column=1,row=1)
 
         self.parChB = ttk.Button(self.regChangeF,text="Parameter ändern",command=self.updateRegValue)
-        self.parChB.grid(column=2,row=1)
+        self.parChB.grid(column=0,row=2,columnspan=2)
 
-        self.resB = ttk.Button(self.regChangeF,text="Auf Standardwerte zurücksetzen", command=self.eeprom.setEeprom)
-        self.resB.grid(column=0,row=2,columnspan=2,sticky=EW)
+        self.resB = ttk.Button(self.regChangeF,text="Auf Standardwerte zurücksetzen",padding=10, command=self.eeprom.setEeprom)
+        self.resB.grid(column=2,row=0,rowspan=3,pady=3,padx=3,sticky=NS)
 
         ###Parameter File Load/Save Begin
         paramSave = ttk.Labelframe(self.paramFileF,text="Neue Datei erzeugen",padding=5)
-        paramSave.grid(column=0,row=0, sticky=EW)
+        paramSave.grid(column=1,row=0, sticky=NS)#, sticky=EW)
         self.fileName = ttk.Entry(paramSave)
         self.fileName.grid(column=0,row=0)
-        ttk.Button(paramSave,text="aktuellen Parametersatz speichern",command=self.createNewParamFile).grid(column=1,row=0)
+        ttk.Button(paramSave,text="aktuellen Parametersatz \nspeichern",command=self.createNewParamFile).grid(column=1,row=0)
 
         paramLoad = ttk.Labelframe(self.paramFileF,text="Alte Datei laden", padding=5)
-        paramLoad.grid(column=0,row=1, sticky=EW)
+        paramLoad.grid(column=0,row=0)#, sticky=EW)
         ttk.Label(paramLoad,text="Groß-/Kleinschreibung beachten\nNur Dateinamen angeben!").grid(column=0,row=0)
         self.fileLoadName = ttk.Entry(paramLoad)
         self.fileLoadName.grid(column=1,row=1)
         ttk.Button(paramLoad,text="Vorhandenen Parametersatz Laden",command=self.loadParamFile).grid(column=0,row=1)        ###Parameter Load/Save End
-
+        #Parameter File Load/Save End
     def createNewParamFile(self):
 
         f = open("./Parametersätze/{}".format(self.fileName.get()),'w')

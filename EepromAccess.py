@@ -53,7 +53,7 @@ class EepromChargeParam(ttk.Frame):
         self.valF.grid(column=0,row=1)
         
         self.parChangeF = ttk.Frame(self, relief='ridge')
-        self.parChangeF.grid(column=1,row=1)
+        self.parChangeF.grid(column=1,row=1, sticky=N)
 
         ttk.Label(self,text="Ladeparameter",font='15').grid(column=1,row=0,sticky=EW)
 
@@ -115,13 +115,14 @@ class EepromChargeParam(ttk.Frame):
         #ttk.Label(self.valF,text="I_max").grid(column=3,row=3,padx=1, sticky=W)
         imaxLabel = ttk.Label(iMax,text=EepromDataComplete[117])
         imaxLabel.grid(column=0,row=0)
-        '''
-        ttk.Label(self.valF,text="variable").grid(column=3, row=4,padx=1, sticky=W)
-        parActLabel = ttk.Label(self.valF,text=EepromDataComplete[119])
-        parActLabel.grid(column=4,row=5)        
-        '''
+
         self.varChargeActText = StringVar()
-        self.varChargeActText.set("Variable Parameter: inaktiv")
+        if EepromDataComplete[119] == 0xF0:
+            self.varChargeActText.set("Variable Parameter: inaktiv")
+        else:   
+            self.varChargeActText.set("Variable Parameter: aktiv")
+
+
         self.changeParActB = ttk.Button(self.parChangeF,textvariable=self.varChargeActText,command=self.changeVarCharge)
         self.changeParActB.grid(column=1,row=0)
 

@@ -11,23 +11,18 @@ class ModulSpannungTEntladung(ttk.Frame):
         ttk.Frame.__init__(self,parent)
         self.grid(sticky=NSEW)
                    
-        self.modulFrame = ttk.Frame(self,relief='ridge')
-        #self.modulFrame.config(width=100,height=100)
-        self.modulFrame.grid(column=0,row=0,sticky=NSEW)
+        self.modulFrame = ttk.Labelframe(self,text="Modul Tiefenentladung")
+        self.modulFrame.grid(column=0,row=0, sticky=NS)     
         
-        headLabel = ttk.Label(self, text="Modul Tiefenentladung",font='20')
-        headLabel.grid(column=0,row=0, padx=2, pady=2, sticky=W)        
+        self.cd = Countdown(self.modulFrame,30)
+        self.cd.grid(column=0, row=1, padx=5, sticky=W)
         
-        self.cd = Countdown(self,30)
-        self.cd.grid(column=0, row=1, padx=5, sticky=EW)
-        
-        self.tSB = ttk.Button(self,text="Modul starten", command=self.startMeas)
-        self.tSB.grid(column=5,row=2,padx=5,pady=5, ipadx=5, sticky=W)
+        self.tSB = ttk.Button(self.modulFrame,text="Modul starten", command=self.startMeas)
+        self.tSB.grid(column=5,row=2,padx=5,pady=5, ipadx=5)
 
         self.indText = "Test inaktiv"
-        self.indLabel = ttk.Label(self, text=self.indText,font='15')
+        self.indLabel = ttk.Label(self.modulFrame, text=self.indText,font='15')
         self.indLabel.grid(column=0,row=2, padx=5, pady=5, sticky=W)
-
 
     def startMeas(self):
         #wait for test to start        
@@ -54,7 +49,7 @@ class ModulSpannungTEntladung(ttk.Frame):
         if errorCheck == False:
             self.indLabel.after(500,self.checkStatus) 
              
-                
+#currently not used
 class ModulSpannungLSchluss(ttk.Frame):
     def __init__(self,parent):
         #super.__init__(self,parent)
@@ -90,15 +85,14 @@ class ModulSpannungUeIm(ttk.Frame):
 
         self.ser = EepromControl()
 
-        self.s = ttk.Style()
-        self.s.configure('ILabelFrame.Label',background = 'green')
+        #self.s = ttk.Style()
+        #self.s.configure('ILabelFrame.Label',background = 'green')
 
-        self.modulFrame = ttk.Frame(self,relief='ridge')
-        self.modulFrame.config(width=100,height=100)
+        self.modulFrame = ttk.Labelframe(self,text="Modul Überladung/Imbalance")
         self.modulFrame.grid(column=5,row=0, columnspan=2, rowspan=2)
 
-        headLabel = ttk.Label(self.modulFrame, text="Modul Überladung/Imbalance", font='10')
-        headLabel.grid(column=0,row=0, padx=2, pady=2, sticky=W)        
+        #headLabel = ttk.Label(self.modulFrame, text="Modul Überladung/Imbalance", font='10')
+        #headLabel.grid(column=0,row=0, padx=2, pady=2, sticky=W)        
 
         bSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag setzen",command=self.setUeFlagActive)#,style="ILabelFrame.Label")
         bSetUe.grid(column=0,row=1, sticky=EW)

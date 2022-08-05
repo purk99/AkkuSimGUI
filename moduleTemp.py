@@ -5,6 +5,7 @@ from tools_V21 import *
 from EepromData import *
 from EepromAccess import *
 
+#Creates Frame to control NTC on Arduino
 class ModulTempNTCError(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
@@ -17,6 +18,7 @@ class ModulTempNTCError(ttk.Frame):
         self.modulframe = ttk.Frame(self)
         self.modulframe.grid(column=1,row=1)
 
+        #create object to control eeprom on Arduino
         self.comm = EepromControl()
         self.comm.setEeprom()   
 
@@ -27,17 +29,16 @@ class ModulTempNTCError(ttk.Frame):
         self.discB.grid(column=0,row=2, sticky=EW)
 
         self.infoL = ttk.Label(self.modulframe,text="NTC Normalzustand", font='20')
-        self.infoL.grid(column=0,row=4, sticky=EW)
+        self.infoL.grid(column=0,row=4, sticky=EW)  
 
-        #eb = ttk.Button(self, text="Fenster schließen",command=self.destroy)
-        #eb.grid(column=1,row=10)        
-
+    #set NTC value to "shorted" value on arduino and in gui
     def shortNTC(self):
         self.comm.setNTCValue(0xF0)
         self.comm.writeNTC()
 
         self.infoL.configure(text="NTC kurzgeschlossen")
 
+    #set NTC value to "disconnected" value on arduino and in gui
     def discNTC(self):       
         self.comm.setNTCValue(0x0F)
         self.comm.writeNTC()

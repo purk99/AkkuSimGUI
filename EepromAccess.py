@@ -4,7 +4,7 @@ from tkinter import ttk
 from EepromData import *
 from tools_V21 import EepromControl
 
-
+###currently not used###
 class EepromInfo(Toplevel):
     def __init__(self,master = None):
         super().__init__(master = master)
@@ -39,10 +39,13 @@ class EepromInfo(Toplevel):
         cp = EepromSafetyParam(self)
         cp.grid(column=10,row=10)
     
+###used for display of all active charge Parameters###
 class EepromChargeParam(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
         
+        #create object for UART interaction
+        #used to change activa charge parameters from this class
         self.arduninoEeprom = EepromControl()
         self.arduninoEeprom.setEeprom()
 
@@ -55,8 +58,10 @@ class EepromChargeParam(ttk.Frame):
         self.parChangeF = ttk.Frame(self, relief='ridge')
         self.parChangeF.grid(column=1,row=1, sticky=N)
 
+        ###HEADLINE###
         ttk.Label(self,text="Ladeparameter",font='15').grid(column=1,row=0,sticky=EW)
 
+        ###Create LabelFrame for every Parameter###
         tMin = ttk.Labelframe(self.valF,text="T_min")
         tMin.grid(column=0,row=0,padx=1)
         tminLabel = ttk.Label(tMin,text=EepromDataComplete[108])
@@ -64,73 +69,68 @@ class EepromChargeParam(ttk.Frame):
 
         tCold = ttk.Labelframe(self.valF,text="T_cold")
         tCold.grid(column=0,row=1,padx=1)
-        #ttk.Label(self.valF,text="T_cold").grid(column=0,row=2,padx=1, sticky=W)
         tcoldLabel = ttk.Label(tCold,text=EepromDataComplete[109])
         tcoldLabel.grid(column=0,row=0)
 
         tWarm = ttk.Labelframe(self.valF,text="T_warm")
         tWarm.grid(column=0,row=2,padx=1)
-        #ttk.Label(self.valF,text="T_warm").grid(column=0,row=3,padx=1, sticky=W)
         twarmLabel = ttk.Label(tWarm,text=EepromDataComplete[110])
         twarmLabel.grid(column=0,row=0)
 
         tMax = ttk.Labelframe(self.valF,text="T_max")
         tMax.grid(column=0,row=3,padx=1)
-        #ttk.Label(self.valF,text="T_max").grid(column=0,row=4,padx=1, sticky=W)
         tmaxLabel = ttk.Label(tMax,text=EepromDataComplete[111])
         tmaxLabel.grid(column=0,row=0)
 
         uCold = ttk.Labelframe(self.valF,text="U_cold")
         uCold.grid(column=0,row=4,padx=1)
-        #ttk.Label(self.valF,text="U_cold").grid(column=0,row=5,padx=1, sticky=W)
         ucoldLabel = ttk.Label(uCold,text=EepromDataComplete[112])
         ucoldLabel.grid(column=0,row=0)
 
         uWarm = ttk.Labelframe(self.valF,text="U_warm")
         uWarm.grid(column=1,row=0,padx=1)
-        #ttk.Label(self.valF,text="U_warm").grid(column=0,row=6,padx=1, sticky=W)
         uwarmLabel = ttk.Label(uWarm,text=EepromDataComplete[113])
         uwarmLabel.grid(column=0,row=0)
 
         uMax = ttk.Labelframe(self.valF,text="U_max")
         uMax.grid(column=1,row=1,padx=1)
-        #ttk.Label(self.valF,text="U_max").grid(column=0,row=7,padx=1, sticky=W)
         umaxLabel = ttk.Label(uMax,text=EepromDataComplete[114])
         umaxLabel.grid(column=0,row=0)
         
         iCold = ttk.Labelframe(self.valF,text="I_cold")
         iCold.grid(column=1,row=2,padx=1)
-        #ttk.Label(self.valF,text="I_cold").grid(column=3,row=1,padx=1, sticky=W)
         icoldLabel = ttk.Label(iCold,text=EepromDataComplete[115])
         icoldLabel.grid(column=0,row=0)
 
         iWarm= ttk.Labelframe(self.valF,text="I_warm")
         iWarm.grid(column=1,row=3,padx=1)
-        #ttk.Label(self.valF,text="I_warm").grid(column=3,row=2,padx=1, sticky=W)
         iwarmLabel = ttk.Label(iWarm,text=EepromDataComplete[116])
         iwarmLabel.grid(column=0,row=0)
 
         iMax= ttk.Labelframe(self.valF,text="I_max")
         iMax.grid(column=1,row=4,padx=1)
-        #ttk.Label(self.valF,text="I_max").grid(column=3,row=3,padx=1, sticky=W)
         imaxLabel = ttk.Label(iMax,text=EepromDataComplete[117])
         imaxLabel.grid(column=0,row=0)
 
+        #check if active charge parameters are active on Arduino
+        #and set gui element accordingly
         self.varChargeActText = StringVar()
         if EepromDataComplete[119] == 0xF0:
             self.varChargeActText.set("Variable Parameter: inaktiv")
         else:   
             self.varChargeActText.set("Variable Parameter: aktiv")
 
-
+        #change active charge parameters 
+        #calls a method to change gui element and update parameter value on Arduino
         self.changeParActB = ttk.Button(self.parChangeF,textvariable=self.varChargeActText,command=self.changeVarCharge)
         self.changeParActB.grid(column=1,row=0)
 
-        ###Änderungen an Charge-Parametern###
+        ###gui elements to change charge-parameters###
         paramChangeL = ttk.Label(self.parChangeF,text="Parameter: ")
         paramChangeL.grid(column=0,row=1)
 
-        #Combobox
+        #Combobox holds all parameter names
+        #used to determine parameter to be changed
         self.combo = ttk.Combobox(self.parChangeF,values=[  "T_min",
                                             "T_cold",
                                             "T_warm",
@@ -144,16 +144,22 @@ class EepromChargeParam(ttk.Frame):
                                         ])
         self.combo.grid(column=1,row=1)
 
+        #updatebutton for parameters
         updateB = ttk.Button(self.parChangeF,text="Parameter ändern",command=self.changeChargeLabels)
         updateB.grid(column=0,row=3)
 
+        #selection of update-value for selected parameter
+        #begin
         valL = ttk.Label(self.parChangeF,text="Wert: ")
         valL.grid(column=0,row=2)
 
         self.valCombo = ttk.Combobox(self.parChangeF,values=EepromDataValues)
         self.valCombo.grid(column=1,row=2)
+        #selection of update-value for selected parameter
+        #end
         
-        
+        #create an array with gui elements to be able to update all parameter values 
+        #and gui elements  in one loop
         self.tchargeLabels = [  tminLabel,
                                 tcoldLabel,
                                 twarmLabel,
@@ -164,24 +170,24 @@ class EepromChargeParam(ttk.Frame):
                                 icoldLabel,
                                 iwarmLabel,
                                 imaxLabel
-                                #parActLabel
                              ]
 
+    #update all gui elements from EEPROM-Array at once
     def updateChargeLabels(self):
         i = 0
         for p in self.tchargeLabels:                	
             self.tchargeLabels[i].configure(text=EepromDataComplete[108 + i])
             i += 1
     
-    #unbedingt auf Reihenfolge und Position in EepromData.py achten!
-    #bei Veränderung der Listen müssen die Indizes überprüft werden
-    def changeChargeLabels(self):
 
+    def changeChargeLabels(self):
+        #self.chargeParamSelect is used to determine EEPROM-Array Index --> register position inside EepromDataComplete
         self.chargeParamSelect =  self.combo.current()+108
+        #update value in EepromDataComplete according to selected update-value
         EepromDataComplete[self.chargeParamSelect] = self.valCombo.get()
-        
+        #update all gui elements
         self.updateChargeLabels()
-        #Eeprom-Daten auf Arduino überschreiben
+        #send updated charge parameter value 
         self.changeEepromData(self.chargeParamSelect,EepromDataComplete[self.chargeParamSelect])
 
     #Änderung von Parametern auf Arduino
@@ -189,7 +195,7 @@ class EepromChargeParam(ttk.Frame):
         self.arduninoEeprom.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)
 
     def changeVarCharge(self):
-        
+        #check if active charge parameters are on or off
         if EepromDataComplete[119] != 0x0F:
             self.varChargeActText.set("Variable Parameter: aktiv")
             EepromDataComplete[119] = 0x0F
@@ -200,6 +206,8 @@ class EepromChargeParam(ttk.Frame):
             EepromDataComplete[119] = 0xF0
             self.changeEepromData(119,EepromDataComplete[119])
             self.updateChargeLabels()
+###ALL CLASSES BELOW ARE NOT USED###
+###CAN BE USED TO EXTEND THE PROGRAM###
 
 #currently not used
 class EepromParamChange(ttk.Frame):
@@ -211,6 +219,7 @@ class EepromParamChange(ttk.Frame):
         
         ttk.Label(self,text="Parameter ändern").grid(column=1,row=0)
         
+#currently not used, displays CC/CV Charge Cycles
 class EepromCycleParam(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
@@ -257,9 +266,8 @@ class EepromCycleParam(ttk.Frame):
         for p in self.cycleLabels:
             self.cycleLabels[i].configure(text=EepromDataCycle[i])
 
+#currently not used, displays safety bytes and Number of cells in series
 class EepromSafetyParam(ttk.Frame):
-
-
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
 

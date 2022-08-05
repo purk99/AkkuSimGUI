@@ -1,3 +1,9 @@
+##################################################
+#   File for testing single frames of the program
+#   for functionality before implementation 
+#   into main program
+##################################################
+
 from csv import *
 from itertools import count
 from math import ceil

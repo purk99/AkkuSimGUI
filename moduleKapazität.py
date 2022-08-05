@@ -1,4 +1,8 @@
-
+########################################
+### Currently not used, since 
+### test module "Kapazität"
+### is not supported yet
+########################################
 
 from tkinter import *
 from tkinter import ttk
@@ -12,7 +16,6 @@ class ModulCapCapacity(ttk.Frame):
         headLabel = ttk.Label(self,text="Testmodul Kapazität", font='20')
         headLabel.grid(column=1,row=0)
 
-        #einzuladende Kap als Hex-Wert(siehe Doku)
         self.chargeCap = 0x80
 
         ttk.Label(self,text="einzuladende Kapazität").grid(column=0,row=1)

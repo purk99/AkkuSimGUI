@@ -7,7 +7,10 @@ STOP_BIT = 0x03
 testList = [0x55, 0x30,0x28,1]
 
 ############################
-###   Serial Beispiel    ###
+###   Serial Test        ###
+### not used in project  ###
+### deprecated Version of###
+### EepromControl        ###
 ############################
 
 class EepromControl():

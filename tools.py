@@ -1,4 +1,8 @@
-#V1.1.6
+##########################################
+### Deprecated Version, use 
+### tools_V21 instead
+##########################################
+
 from threading import Thread
 from tkinter import *
 from tkinter import ttk

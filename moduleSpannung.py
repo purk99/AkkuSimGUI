@@ -5,15 +5,17 @@ from click import style
 
 from tools_V21 import *
 
+#class for test module "Tiefenentladung"
 class ModulSpannungTEntladung(ttk.Frame):
     def __init__(self,parent):
-    
+        
         ttk.Frame.__init__(self,parent)
         self.grid(sticky=NSEW)
                    
         self.modulFrame = ttk.Labelframe(self,text="Modul Tiefenentladung")
         self.modulFrame.grid(column=0,row=0, sticky=NS)     
         
+        #create countdown object
         self.cd = Countdown(self.modulFrame,30)
         self.cd.grid(column=0, row=1, padx=5, sticky=W)
         
@@ -24,21 +26,29 @@ class ModulSpannungTEntladung(ttk.Frame):
         self.indLabel = ttk.Label(self.modulFrame, text=self.indText,font='15')
         self.indLabel.grid(column=0,row=2, padx=5, pady=5, sticky=W)
 
+    #method called by button click
     def startMeas(self):
-        #wait for test to start        
+        #create object to communicate with ina226(no gui elements)      
         self.meas = SensorReadValuesOnly() 
         self.indLabel.configure(text="Test aktiv,\nwarte auf Ladestrom")
+        #call next method
         self.waitForCurrent()
         
 
     def waitForCurrent(self):        
+        #if measured bus-current > 1A
         if int(self.meas.ina226_getCurr()) > 1:
+            #call next method
             self.checkStatus()
+            #start 30s countdown
             self.cd.countdown()
+        #if measured bus-current < 1A
         else:
+            #methods calls itself every 500 ms
             self.indLabel.after(500,self.waitForCurrent)
     
     #display status according to timer 
+    #show time in seconds after charger error
     def checkStatus(self):
         errorCheck = False
         if int(self.meas.ina226_getCurr() < 1):
@@ -47,6 +57,7 @@ class ModulSpannungTEntladung(ttk.Frame):
             errorCheck = True
 
         if errorCheck == False:
+            #method calls itself every 500 ms
             self.indLabel.after(500,self.checkStatus) 
              
 #currently not used
@@ -79,22 +90,22 @@ class ModulSpannungLSchluss(ttk.Frame):
         self.maxBatVoltL.configure(text=self.voltVal)
         self.maxBatVoltL.after(1000,self.checkMaxVol)
 
+#class for test module "Überladung/Imbalance"
 class ModulSpannungUeIm(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
 
+        #create object to control eeprom
         self.ser = EepromControl()
 
         #self.s = ttk.Style()
         #self.s.configure('ILabelFrame.Label',background = 'green')
 
+        #initialize gui elements
         self.modulFrame = ttk.Labelframe(self,text="Modul Überladung/Imbalance")
-        self.modulFrame.grid(column=5,row=0, columnspan=2, rowspan=2)
+        self.modulFrame.grid(column=5,row=0, columnspan=2, rowspan=2)  
 
-        #headLabel = ttk.Label(self.modulFrame, text="Modul Überladung/Imbalance", font='10')
-        #headLabel.grid(column=0,row=0, padx=2, pady=2, sticky=W)        
-
-        bSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag setzen",command=self.setUeFlagActive)#,style="ILabelFrame.Label")
+        bSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag setzen",command=self.setUeFlagActive)
         bSetUe.grid(column=0,row=1, sticky=EW)
 
         bUnSetUe = ttk.Button(self.modulFrame,text="Überspannungsflag deaktivieren", command=self.setUeFlagInactive)
@@ -108,16 +119,23 @@ class ModulSpannungUeIm(ttk.Frame):
 
 
     def startModule(self):
+        #create object to communicate with ina226(no gui elements)
         self.meas = SensorReadValuesOnly()
         self.tStatusL.configure(text="Test aktiv,\nÜberspannung inaktiv")
 
+    #set Overvoltage value to active 
     def setUeFlagActive(self):    
+        #set eeprom-array on Raspberry Pi
         self.ser.setOvValue(0xF0) 
+        #send overvoltage value from eeprom-array(raspberry pi) to arduino
         self.ser.writeOvervoltage()
         self.tStatusL.configure(text="Überspannung aktiv")
-        
+    
+    #set Overvoltage value to inactive 
     def setUeFlagInactive(self):    
+        #set eeprom-array on Raspberry Pi
         self.ser.setOvValue(0x0F)     
+        #send overvoltage value from eeprom-array(raspberry pi) to arduino
         self.ser.writeOvervoltage()
         self.tStatusL.configure(text="Test aktiv,\nÜberspannung inaktiv")
        

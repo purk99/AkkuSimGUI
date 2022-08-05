@@ -1,3 +1,8 @@
+##################################################
+#   File for testing the display of all 
+#   register positions of the eeprom 
+##################################################
+
 from cgitb import text
 from itertools import tee
 import string
@@ -19,16 +24,6 @@ counter1 = 1
 indexF = [ttk.Label] * 135
 valueF = [ttk.Label] * 135
 lfF = [ttk.Labelframe] * 135
-#labelF = ttk.Labelframe(frame,text="test")
-#labelF.grid(column=0,row=0)
-
-#labelframe = ttk.Labelframe(frame, text="This is a LabelFrame")
-#labelframe.pack(fill="both", expand="yes")
-#labelframe.grid(column=0,row=1)
- 
-#left = ttk.Label(labelframe, text="Inside the LabelFrame")
-#left.pack()
-#left.grid(column=0,row=0)
 
 ttk.Label(root,text="EEPROM Daten",font='30').grid(column=0,row=0)
 
@@ -47,14 +42,5 @@ for i in range(135):
     indexF[i].grid(column=0,row=0, sticky=W)
     valueF[i] = ttk.Label(lfF[i],text="{:03d}".format(i))
     valueF[i].grid(column=1,row=0, sticky=E)
-    
-
-
-
-#for p in indexF:
-#    p.configure(text=1)
-
-#for x in valueF:
-#    x.configure(text=0)
 
 root.mainloop()

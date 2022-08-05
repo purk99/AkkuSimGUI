@@ -1,3 +1,9 @@
+##################################################
+#   File for testing single methods of the program
+#   for functionality before implementation 
+#   into main program
+##################################################
+
 from tkinter import *
 from tkinter import ttk
 

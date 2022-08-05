@@ -1,3 +1,9 @@
+#####################################################
+### File for Toplevel-Classes
+### TopLevel Classes Generate new Windows
+### which can be filled with Frames(other classes)
+#####################################################
+
 from re import T
 from tkinter import ttk
 from tkinter import *

@@ -1,19 +1,13 @@
 ########################################################
-###         Zentrale Datei zum Speichern 
-#                 von Zuständen 
-###                Für Arduino
-#       (sowohl EEPROM als auch NTC und Overvoltage)
+###         File for Saving Parameters 
+###         Of Arduino and Raspberry Pi
+###           EEPROM,NTC,Overvoltage
 ########################################################
 
-###                         !!ACHTUNG!!
-#bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
-#in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
-#Indizierung prüfen
-###                         !!ACHTUNG!!
 
 from numpy import *
 
-###Commands für Arduino
+###Commands for Arduino###
 uartCMD = {
     "eepromReadSingleReg"   :   0x01,
     "eepromWriteSingleReg"  :   0x02,
@@ -58,29 +52,27 @@ EepromDataDict = {
     "varCharge"     : 0xF0
 }
 
+###Array for storing Values of NTC and Overvoltage
 InfoDataDict = {
     "NTCvalue"      : 0xf0,
     "Overvoltage"   : 0xf0
                 }
-#bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
-#in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
-#Indizierung prüfen
+
+###Array for storing EEPROM-simulating values###
 EepromDataComplete = [1] * 150
 
-#contains data for ntc(0) and ov(1)
+###contains data for ntc(0) and ov(1)###
 InfoData = [InfoDataDict["NTCvalue"],
             InfoDataDict["Overvoltage"]
 
             ]
 
+###Additional Arrays - CURRENTLY NOT USED ###
 EepromDataSafety = [EepromDataDict["safetyB1"],
                     EepromDataDict["safetyB2"],
                     EepromDataDict["cellsInSer"]
                 ]
 
-#bei Veränderung der Listen müssen die Indizes in EepromAccess überprüft werden
-#in EepromAccess wird auf diese Listen zugegriffen! Bei jeder Veränderung auf richtige
-#Indizierung prüfen
 EepromDataCharge = [EepromDataDict["T_min"],
                     EepromDataDict["T_cold"],
                     EepromDataDict["T_warm"],
@@ -102,6 +94,7 @@ EepromDataCycle = [ EepromDataDict["numCCstart1"],
                     EepromDataDict["numCVstop2"]
                 ]
 
+###Lists/Arrays for Listboxes like Calibration Boxes etc.
 EepromDataValues = list(range(256))
 CalibrationFine = list(arange(0,1,0.1))
 CalibrationCoarse = list(range(0,6))

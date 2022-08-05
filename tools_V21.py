@@ -14,17 +14,16 @@ from pigpio import *
 START_BIT = 2
 STOP_BIT = 3
 
-#neuer Kommentar
-
+#responsible for communication with INA226
 class SensorRead(ttk.Frame):
 
     def __init__(self,parent): 
 
-        #I2C-Kommunikation initialisieren
-        #self.ina226 = SMBus(1)
+        #initialize I2C-communication
         self.ina226_adress = 0x40
         self.ina226 = pi()
 
+        #registers used for access of ina226
         self.ina226_config_reg =    0   #R/W
         self.ina226_shunt_reg =     1   #R
         self.ina226_bus_reg =       2   #R
@@ -32,31 +31,30 @@ class SensorRead(ttk.Frame):
         self.ina226_curr_reg =      4   #R
         self.ina226_cal_reg =       5   #R/W
 
+        #used for internal calinration of ina226
         self.currentLSB = float16
         self.cal = int16
-        #I2C Ende
-
         self.maxExpCurr = 10
         self.shuntResValue = 0.00475
 
+        #attributes used to save measured values
         self.voltBat = float(10)
         self.voltCell = float(10)
         self.currBat = float(10)
         self.powBat = float(10)
 
+        #offset attributes for measured values 
         self.busVoltOffset = 0
         self.shuntVoltOffset = 0
         self.busCurrOffset = 0
         self.powerOffset = 0
-        
-        #dummywerte
-        #self.voltage_meas = 18
-        #self.current_meas = 5
 
+        #initialize frame
         ttk.Frame.__init__(self, parent)
         
         self.grid()
 
+        #GUI elements
         sensFrame = ttk.Labelframe(self,text="Messwerte")
         sensFrame.grid(padx=3, pady=3, sticky=NSEW)
 
@@ -87,22 +85,24 @@ class SensorRead(ttk.Frame):
         startMeasB = ttk.Button(sensFrame,text="Starte Messung",command=self.checkMeas)
         startMeasB.grid(column=0,row=5, pady=2, sticky=EW, columnspan=2)
 
+        #to recalibrate, uncomment if needed
+        #can be used if GUI is extended
         #calB = ttk.Button(sensFrame,text="Neukalibrierung",command=self.calib)
         #calB.grid(column=0,row=5)
 
+        #initializing of core functions
         self.ina226_writeReg(self.ina226_config_reg, 0x45A7)
         self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
+        #get right offset values from CSV file
         self.readCalibrationValuesFromCSV()
-        
-    #def calib(self):
-    #   #Config-register beschreiben
-    #    self.ina226_calibrateReg(6,0.01)
 
+    #method calls itself every 100ms
     def checkMeas(self):
+        #update-method for all measurements
         self.updateValues()
         self.voltageBatl.after(100,self.checkMeas)
 
-    #Testfunktion zum Prüfen der Funktion von I2C Kommunikation
+    #gui elements are refreshed here
     def updateValues(self):
         cellVoltage = self.ina226_getBusVoltage()/int(EepromDataComplete[2])
         self.currentBatl.configure(text = '{:05.2f}'.format(self.ina226_getCurr()))
@@ -110,7 +110,7 @@ class SensorRead(ttk.Frame):
         self.voltageBatl.configure(text = '{:05.2f}'.format(self.ina226_getBusVoltage()))
         self.shuntVoltL.configure(text='{:05.2f}'.format(self.ina226_getShuntVoltage()))
 
-    #Auslesen von Register 
+    #read single register from ina226
     def ina226_readReg(self,adress):
         h = self.ina226.i2c_open(1,self.ina226_adress)
         #self.ina226.i2c_write_byte(h,adress)
@@ -119,20 +119,20 @@ class SensorRead(ttk.Frame):
         self.ina226.i2c_close(h)
         return regVal
 
+    #write single register to ina226
     def ina226_writeReg(self,adress,content = uint16):
         h = self.ina226.i2c_open(1,self.ina226_adress)
         test = [content >> 8, content & 0xff]
         self.ina226.i2c_write_i2c_block_data(h,adress,test)
         self.ina226.i2c_close(h)
 
-    #eventuell currentLSB fest berechnen, wenn mit 20A gerechnet wird
+    #calculate and set calibration register value to calibration register
     def ina226_calibrateReg(self, maxExpectCurr = uint16,rShunt = float16):
         self.currentLSB = maxExpectCurr/(2**15)
-        #self.currentLSB = 0.5e-3
         self.cal = uint16(0.00512/(self.currentLSB*rShunt))
-        #self.cal = uint16(1707)
         self.ina226_writeReg(self.ina226_cal_reg,self.cal)
 
+    #get latest offset values from csv
     def readCalibrationValuesFromCSV(self):
         file = open('calibVals.CSV')
         arr = numpy.loadtxt(file, delimiter=',')
@@ -143,7 +143,7 @@ class SensorRead(ttk.Frame):
         self.powerOffset        = arr[3]
        
 
-    #kann zu testzwecken ausgelesen werden
+    #methods for access of the ina226
     def ina226_getShuntVoltage(self):
         shuntVolt = float((int16(self.ina226_readReg(self.ina226_shunt_reg)) * 2.5e-3)/2 + (self.shuntVoltOffset))
         return round(shuntVolt,4)
@@ -154,9 +154,6 @@ class SensorRead(ttk.Frame):
 
     def ina226_getCurr(self):
         busCurr = float((int16(self.ina226_readReg(self.ina226_curr_reg))*self.currentLSB) + self.busCurrOffset)
-        #busCurr = float((int16(self.ina226_readReg(self.ina226_curr_reg))*0.5e-3) + self.busCurrOffset)
-        #busCurr = float(((self.ina226_readReg(self.ina226_curr_reg))*self.currentLSB) + self.busCurrOffset)
-        
         return round(busCurr,2)
 
     def ina226_getPower(self):
@@ -208,6 +205,8 @@ class SensorRead(ttk.Frame):
     def ina226_getShuntResValue(self):
         return self.shuntResValue
     
+#like SensorRead, but without a Frame
+#can be used if ina226 needs to be accessed without gui elements    
 class SensorReadValuesOnly():
     def __init__(self):
         self.ina226_adress = 0x40
@@ -222,9 +221,6 @@ class SensorReadValuesOnly():
 
         self.currentLSB = float16
         self.cal = int16
-
-        #I2C Ende
-
         self.maxExpCurr = 10
         self.shuntResValue = 0.00475
 
@@ -237,16 +233,12 @@ class SensorReadValuesOnly():
         self.busCurrOffset = 0
         self.powerOffset = 0
 
-        #initialize calibration Register on INA226 Chip
         self.ina226_calibrateReg(self.maxExpCurr,self.shuntResValue)
         self.ina226_writeReg(self.ina226_config_reg, 0x45A7)
-        #read correction Values from CSV File
         self.readCalibrationValuesFromCSV()
 
-    #Auslesen von Register 
     def ina226_readReg(self,adress):
         h = self.ina226.i2c_open(1,self.ina226_adress)
-        #self.ina226.i2c_write_byte(h,adress)
         recVal =    uint16(self.ina226.i2c_read_word_data(h,adress))
         regVal =    uint16((recVal >> 8)|(recVal << 8))
         self.ina226.i2c_close(h)
@@ -272,7 +264,6 @@ class SensorReadValuesOnly():
         self.busCurrOffset      = arr[2]
         self.powerOffset        = arr[3]
 
-    #kann zu testzwecken ausgelesen werden
     def ina226_getShuntVoltage(self):
         shuntVolt = float((self.ina226_readReg(self.ina226_shunt_reg) * 2.5e-6) + (self.shuntVoltOffset))
         return round(shuntVolt,4)
@@ -338,19 +329,18 @@ class SensorReadValuesOnly():
     def ina226_getShuntResValue(self):
         return self.shuntResValue
            
+#Creates a timer
 class Countdown(ttk.Frame):
     def __init__(self,parent,duration):
         ttk.Frame.__init__(self, parent)
-        #super().__init__()
         
         self.grid()
 
-        #variable für Ausgabe
-        #ÄNDERN AUF 30, NUR ZUM TESTEN AUF 10
         self.dur = duration
         self.durStart = self.dur
         self.secFormat = self.dur
         
+        #create gui elements
         ttk.Label(self, text="Timer", font='20').grid(column=0,row=0, padx=5,sticky=W)
 
         self.tl = ttk.Label(self, text=self.secFormat, font='20')
@@ -358,22 +348,14 @@ class Countdown(ttk.Frame):
 
         ttk.Label(self,text="Sek.",font='20').grid(column=2,row=0, padx=5)
 
-###########################################################
-###         damit über mehrere Funktionen auf Variablen
-###         zugegriffen werden kann
-###         --> self. vor jede variable, damit wird
-##                          Klassenvariable erzeugt
-
-    #Hier wird countdown erzeugt
-    #callback nach 1s auf Funktion selbst
-    #--> python after()
-
+    #sets self.dur(timer counter variable) to start duration time
     def countdown(self):
         self.dur=self.durStart
+        #calls the method to start the countdown
         self.startCountdown()
 
     def startCountdown(self):
-        #update happens before if condition
+        #update of gui element
         self.secFormat = '{:02d}'.format(self.dur)   
         self.tl.configure(text=self.secFormat)
         if self.dur > 0:   
@@ -382,81 +364,105 @@ class Countdown(ttk.Frame):
             self.dur -= 1
             self.tl.after(1000,self.startCountdown)
     
+    #getter
     def getTime(self):
         return self.dur
     def getStartDur(self):
         return self.durStart
 
-#für UART-Kommunikation
+#UART-communication with Arduino
 class EepromControl():
     def __init__(self):
-        #super().__init__()
-        #self.setEeprom()
+
+        #communication buffer
         self.sendBuffer = bytearray(5)
         self.receiveBuffer = bytearray(3)
+        #initialize uart port on RaspBi
         self.ser = serial.Serial("/dev/ttyAMA0", 9600)
 
+    #basic-level method,
+    #creates package with 5 Bytes
     def sendPackage(self,id,adress,content):
         self.sendBuffer[0] = START_BIT
         self.sendBuffer[1] = id
         self.sendBuffer[2] = uint8(adress)
         self.sendBuffer[3] = uint8(content)
         self.sendBuffer[4] = STOP_BIT
+        #send package via uart
         self.ser.write(self.sendBuffer)
 
+    #read package from uart bus
     def receivePackage(self):
         self.receiveBuffer = self.ser.read(3)
 
+        #check if package contains start & stop byte
         payload = (self.receiveBuffer[1])
         if ((self.receiveBuffer[0] == START_BIT) & (self.receiveBuffer[2] == STOP_BIT)):
             return uint8(payload)
 
-
+    #read single register from eeprom-array on arduino
     def readSingleRegister(self,adress):
+        #send read eeprom command to arduino
         self.sendPackage(uartCMD["eepromReadSingleReg"], adress, 1)
         return self.receivePackage()
 
     def readAllRegisters(self):
+        #initialize buffer to store eeprom data from arduino
         EepromBuffer = [uint8(0)] * 150
         for i in range(150):
+            #read every register from arduino
             EepromBuffer[i] = self.readSingleRegister(i)
-            #EepromDataComplete[i] = self.readSingleRegister(i)
+        #return 150 bytes
         return EepromBuffer
 
+    #write single register to eeprom-array on arduino
     def writeSingleRegister(self,adress,content):
+        #send write command, register adress and new register content 
         self.sendPackage(uartCMD["eepromWriteSingleReg"],adress,content)
 
+    #read value from ntc-array on arduino
     def readNTC(self):
         self.sendPackage(uartCMD["ntcRead"],1,1)
         return self.receivePackage()
-        
+    
+    #write value to ntc-array on arduino
     def writeNTC(self):
         self.sendPackage(uartCMD["ntcWrite"],1,InfoData[0])
 
+    #read overvoltage value from ntc-array on arduino
     def readOverVoltage(self):
         self.sendPackage(uartCMD["voltageProtectRead"],1,1)
         return self.receivePackage()
 
+    #write overvoltage value to ntc-array on arduino
     def writeOvervoltage(self):
         self.sendPackage(uartCMD["voltageProtectWrite"],1,InfoData[1])
 
+    #set infodata values for ntc on Raspberry Pi from value parameter
+    #infodata --> stores ntc and ov-values
     def setNTCValue(self,value):
         InfoData[0] = value
 
+    #set infodata values for ov on Raspberry Pi from value parameter
     def setOvValue(self,value):
         InfoData[1] = value
 
     def getArduinoEepromAndInfoData(self):
+        ###Call At the start of the program to synchronise arrays of Raspberry Pi and Arduino###
+        #--> Synchronization of EEPROM-simulating-Arrays on Arduino and Raspberry Pi
+
         #reads Register Values from Arduino and saves them into EepromActualParams
         ardEepromData = self.readAllRegisters()
         #read Info Values and save them into infoActualParams.py
         ardInfoData = [self.readNTC(),self.readOverVoltage()]
 
+        #get eeprom parameter values from csv
         f = open('./EEPROMPARAMS/EepromActualParams.CSV','w')
         writer = csv.writer(f)
         writer.writerow(ardEepromData)
         f.close()
 
+        #get info values from csv
         g = open('./EEPROMPARAMS/InfoActualParams.CSV','w')
         writer = csv.writer(g)
         writer.writerow(ardInfoData)
@@ -465,7 +471,6 @@ class EepromControl():
     def setEeprom(self):
         #reads all Registers from CSV files and feeds them into 
         #Raspberry-Sided EEPROM-Register and Info-Register
-        #--> Synchronization of EEPROM-simulating-Arrays on Arduino and Raspberry Pi
         f = open('./EEPROMPARAMS/EepromActualParams.CSV')
         arr = numpy.loadtxt(f,delimiter=',')
 
@@ -478,7 +483,8 @@ class EepromControl():
         for p in range(size(arr)):
             InfoData[p] = int(arr[p])
 
-#Ermöglicht Konvertieren von EEPROM Werten in auslesbare Werte
+#can be used to convert values from various data types
+#needs rework and extension
 class HexValConvert():
     def __init__(self):
         dummyVal = 0

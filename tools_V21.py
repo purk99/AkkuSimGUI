@@ -56,7 +56,7 @@ class SensorRead(ttk.Frame):
 
         #GUI elements
         sensFrame = ttk.Labelframe(self,text="Messwerte")
-        sensFrame.grid(padx=3, pady=3, sticky=NSEW)
+        sensFrame.grid(padx=3, sticky=NSEW)
 
         vbl = ttk.Label(sensFrame, text="Spannung Batterie", font=20)
         vbl.grid(column=0,row=1, sticky=W)
@@ -442,10 +442,12 @@ class EepromControl():
     #infodata --> stores ntc and ov-values
     def setNTCValue(self,value):
         InfoData[0] = value
+        self.writeNTC()
 
     #set infodata values for ov on Raspberry Pi from value parameter
     def setOvValue(self,value):
         InfoData[1] = value
+        self.writeOvervoltage()
 
     def getArduinoEepromAndInfoData(self):
         ###Call At the start of the program to synchronise arrays of Raspberry Pi and Arduino###

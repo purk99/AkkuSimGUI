@@ -70,10 +70,17 @@ class ModulTemperatur(Toplevel):
         self.ntc = ModulTempNTCError(self)
         self.ntc.grid(column=1,row=2,sticky=NSEW)
         
-        self.valF = ttk.Frame(self, relief = 'ridge')
+        self.valF = ttk.Labelframe(self,text="Temperaturhysterese")
+        #self.valF = ttk.Frame(self, relief = 'ridge')
         self.valF.grid(column=0,row=1, sticky=NSEW)
         self.valF.columnconfigure(0,weight=1)
         self.valF.rowconfigure(0,weight=1)
+
+        self.manTempF = ttk.Labelframe(self.valF,text="Manuelle Temperatur")
+        self.manTempF.grid(columnspan=1,column=0,row=7, sticky=W)
+        
+        self.currTemp = ttk.Labelframe(self.valF, text="Aktuelle Temperatur")
+        self.currTemp.grid(column=1, row=7, sticky=NSEW)
 
         self.eeprom = EepromControl()
         self.eeprom.setEeprom()
@@ -95,21 +102,21 @@ class ModulTemperatur(Toplevel):
 
     
         tempB = ttk.Button(self.valF,text="Test Starten",command = self.setTempToStartVal)
-        tempB.grid(column=1, row=6)
+        tempB.grid(column=1, row=6, sticky=EW)
 
-        ttk.Label(self.valF,text="Manuelle Temperatureinstellung",font='10').grid(column=0,row=7)
+        #ttk.Label(self.valF,text="Manuelle Temperatureinstellung",font='10').grid(column=0,row=7)
 
-        ttk.Label(self.valF,text="Neue Temperatur").grid(column=0,row=8)
-        self.mTempL = ttk.Combobox(self.valF,values=NTCTemps)
-        self.mTempL.grid(column=1,row=8,sticky=W)
+        ttk.Label(self.manTempF,text="Neue Temperatur").grid(column=0,row=0)
+        self.mTempL = ttk.Combobox(self.manTempF,values=NTCTemps)
+        self.mTempL.grid(column=1,row=0,sticky=W)
 
-        self.newTempB = ttk.Button(self.valF,text="Temperatur einstellen",command=self.setManualTemp)
-        self.newTempB.grid(column=1,row=9)
+        self.newTempB = ttk.Button(self.manTempF,text="Temperatur einstellen",command=self.setManualTemp)
+        self.newTempB.grid(column=1,row=1,sticky=EW)
 
         self.tempAktuell = InfoData[0]
-        ttk.Label(self.valF,text="Aktuelle Temperatur",font='15').grid(column=0,row=10)
-        self.tAL = ttk.Label(self.valF,text=self.tempAktuell,font='15')
-        self.tAL.grid(column=1,row=10)
+        tempText = "{}°C".format(self.tempAktuell) 
+        self.tAL = ttk.Label(self.currTemp,text=tempText,font=30)
+        self.tAL.grid(padx=75,pady=20)
 
         #self.testStatus = ttk.Label(self.valF,text="Teststatus",font='15').grid(column=0,row=11)
         #self.tSL = ttk.Label(self.valF,text="Okay",font='15')
@@ -166,7 +173,8 @@ class ModulTemperatur(Toplevel):
 
     def setManualTemp(self):
         self.tempAktuell = int(self.mTempL.get())
-        self.tAL.configure(text=self.tempAktuell)
+        tempText = "{} °C".format(self.tempAktuell)
+        self.tAL.configure(text=tempText)
         self.ntc.refreshNTCValue("NTC Normalzustand")
         self.setNTCinEeprom(NTCTempValues[self.tempAktuell+35])
 

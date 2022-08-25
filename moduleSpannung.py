@@ -38,6 +38,8 @@ class ModulSpannungTEntladung(ttk.Frame):
     def waitForCurrent(self):        
         #if measured bus-current > 1A
         if int(self.meas.ina226_getCurr()) > 1:
+            #change displayed text in GUI
+            self.indLabel.configure(text="Ladestrom liegt an")
             #call next method
             self.checkStatus()
             #start 30s countdown
@@ -52,7 +54,7 @@ class ModulSpannungTEntladung(ttk.Frame):
     def checkStatus(self):
         errorCheck = False
         if int(self.meas.ina226_getCurr() < 1):
-            outputString = "Ladegerät Error nach \n{} Sekunden".format(self.cd.getTime())
+            outputString = "Ladegerät Error nach \n{} Sekunden".format((self.cd.getStartDur() - self.cd.getTime()))
             self.indLabel.configure(text=outputString)
             errorCheck = True
 
@@ -95,9 +97,6 @@ class ModulSpannungUeIm(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
 
-        #create object to control eeprom
-        self.ser = EepromControl()
-
         #self.s = ttk.Style()
         #self.s.configure('ILabelFrame.Label',background = 'green')
 
@@ -119,24 +118,29 @@ class ModulSpannungUeIm(ttk.Frame):
 
 
     def startModule(self):
+
+        #create object to control eeprom
+        self.ser = EepromControl()
+
         #create object to communicate with ina226(no gui elements)
         self.meas = SensorReadValuesOnly()
+        
         self.tStatusL.configure(text="Test aktiv,\nÜberspannung inaktiv")
 
     #set Overvoltage value to active 
     def setUeFlagActive(self):    
         #set eeprom-array on Raspberry Pi
-        self.ser.setOvValue(0xF0) 
         #send overvoltage value from eeprom-array(raspberry pi) to arduino
-        self.ser.writeOvervoltage()
+        self.ser.setOvValue(0xF0) 
+        
         self.tStatusL.configure(text="Überspannung aktiv")
     
     #set Overvoltage value to inactive 
     def setUeFlagInactive(self):    
         #set eeprom-array on Raspberry Pi
-        self.ser.setOvValue(0x0F)     
         #send overvoltage value from eeprom-array(raspberry pi) to arduino
-        self.ser.writeOvervoltage()
+        self.ser.setOvValue(0x0F)     
+
         self.tStatusL.configure(text="Test aktiv,\nÜberspannung inaktiv")
        
 
